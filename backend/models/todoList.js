@@ -1,25 +1,16 @@
-import mongoose, { model } from 'mongoose';
-import Item from './todoItem';
-const { Schema } = mongoose;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const todoItemSchema = new Schema({
+const todoListSchema = new Schema({
     title: {
         type: String,
         default: '',
-        required: 'List name cannot be empty'
+        required: [true, 'List name cannot be empty']
     },
-    isCompleted: {
-        type: Boolean,
-        default: 'false'
-    },
-    date: {
-        type: Date,
-        default: Date.now
-    },
-    itemlist: [{
+    user: [{
         type: Schema.Types.ObjectId,
-        ref: 'Item'
+        ref: 'user'
     }]
 })
 
-module.exports = mongoose.model('todoItem', todoItemSchema);
+module.exports = mongoose.model('todoList', todoListSchema);

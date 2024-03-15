@@ -1,15 +1,16 @@
-import mongoose, { model } from 'mongoose';
-const { Schema } = mongoose;
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
 
 const todoItemSchema = new Schema({
     task: {
         type: String,
         default: '',
-        required: 'Task cannot be emptied'
+        required: [true, 'Task name cannot be empty']
     },
     isCompleted: {
         type: Boolean,
-        default: 'false'
+        default: false
     },
     date: {
         type: Date,
@@ -20,6 +21,10 @@ const todoItemSchema = new Schema({
         default: 2,
         min: 1,
         max: 3
+    },
+    todoList: {
+        type: Schema.Types.ObjectId,
+        ref: 'todoList'
     }
 })
 
