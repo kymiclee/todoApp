@@ -18,6 +18,7 @@ const todoRoutes = require('./routes/todoItem')
 //Express Setup
 const app = express()
 app.use(express.json());
+app.use(passport.session())
 
 // Session Setup 
 app.use(session({
