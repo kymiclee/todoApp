@@ -39,7 +39,7 @@ router.put('/:listId/items/:itemId', async (req, res) => {
             return res.status(404).json({ error: 'Todo item not found in the specified list' });
         }
         const updateTodo = await todoItem.findByIdAndUpdate(itemId, updatedData, { new: true })
-        console.log("Updated Todo:", updateTodo);
+        console.log({ message: "Updated Todo:", updateTodo });
         return res.status(200).json(updateTodo)
     } catch (error) {
         return res.status(400).json({ error: error.message })

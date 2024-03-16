@@ -20,7 +20,7 @@ router.post('/register', async (req, res) => {
 
 });
 
-// Login a user
+// Login a user with local stragegy 
 router.post('/login', passport.authenticate('local'), async (req, res) => {
     // Logic to authenticate a user
 
@@ -29,6 +29,7 @@ router.post('/login', passport.authenticate('local'), async (req, res) => {
         req.session.user = req.user
         req.session.save(function (err) {
             if (err) return next(err)
+            //with passport middleware, the req.user is the user's object 
             return res.json({ message: 'Login successful', user: req.user });
         })
     })
@@ -45,11 +46,15 @@ router.put('/password', async (req, res) => {
 // Logout user 
 router.post('/logout', async (req, res) => {
     // Logic to logout user
-    req.session.user = null
-    req.session.save(function (err) {
+
+    req.session.save(function (err) { // apply the changes before user logs out 
+        if (err) next(err)
+    })
+    req.session.user = null// removing user related information from session 
+    req.session.save(function (err) { // apply the changes 
         if (err) next(err)
 
-        req.session.regenerate(function (err) {
+        req.session.regenerate(function (err) { // creates new session 
             if (err) next(err)
             return res.json({ message: 'Successfully logged out ', user: null })
         })

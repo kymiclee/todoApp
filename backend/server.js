@@ -25,15 +25,20 @@ app.use(express.json());
 // app.use(passport.session())
 
 // Session Setup 
+const dbUrl = process.env.MONGO_URI
 app.use(session({
-    secret: 'keyboard cat',
+    secret: 'secret',
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 60000 }
+    cookie: { maxAge: 60000 },
+    store: MongoStore.create(
+        {
+            mongoUrl: dbUrl
+        })
 }))
 
 // Mongoose Connection 
-const dbUrl = process.env.MONGO_URI
+// const dbUrl = process.env.MONGO_URI
 mongoose.connect(dbUrl)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
@@ -43,6 +48,21 @@ mongoose.connect(dbUrl)
 //passport configuration
 app.use(passport.initialize());
 app.use(passport.session())
+
+passport.use(new LocalStrategy(
+    function (username, password, done) {
+        User.findOne({ username: username }, function (err, user) {
+            if (err) { return done(err); }
+            if (!user) { return done(null, false); } // User not found
+
+            bcrypt.compare(password, user.password, function (err, isMatch) {
+                if (err) { return done(err); }
+                if (!isMatch) { return done(null, false); } // Incorrect password
+                return done(null, user); // Authentication successful
+            });
+        });
+    }
+));
 
 
 //Passport serialization

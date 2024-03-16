@@ -1,3 +1,4 @@
+// @ts-nocheck
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -27,5 +28,10 @@ const todoItemSchema = new Schema({
         ref: 'todoList'
     }
 })
+
+todoItemSchema.pre('remove', function (next) {
+    console.log('Query validate');
+    next();
+});
 
 module.exports = mongoose.model('todoItem', todoItemSchema);
