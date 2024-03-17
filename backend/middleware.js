@@ -1,5 +1,19 @@
-// is loggedin middleware
+// @ts-nocheck
+const user = require('./models/users')
+module.exports.isUsernameUsed = async (req, res, next) => {
+    const { username } = req.body
+    try {
+        const name = await user.findOne({ username })
+        if (name) {// if it exist
+            return res.status(400).json({ error: 'Username already used' })
+        } else {
+            next();
+        }
+    } catch (error) {
+        return res.status(400).json({ error: error.message })
+    }
+}
 
+module.exports.isLoggedIn = async (req, res, next) => {
 
-// error handling middleware
-
+}
