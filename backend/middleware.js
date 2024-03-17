@@ -15,5 +15,9 @@ module.exports.isUsernameUsed = async (req, res, next) => {
 }
 
 module.exports.isLoggedIn = async (req, res, next) => {
-
+    if (req.isAuthenticated()) {// using passport function here to verify presense of req.user
+        next()
+    } else {
+        return res.status(400).json({ message: 'User is not logged in' })
+    }
 }
