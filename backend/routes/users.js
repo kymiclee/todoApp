@@ -3,20 +3,26 @@ const express = require('express')
 const router = express.Router()
 const users = require('../models/users')
 const bcrypt = require('bcrypt');
-
+const passport = require('passport');
 
 // Register a new user
 router.post('/register', async (req, res) => {
     // Logic to create a new user account
     const { username, password } = req.body
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await users.create({ username, hashedPassword })
-
-    // sets up session with userId and username
-    req.session.userId = newUser._id
-    req.session.username = username
-    req.session.save()
-    return res.json({ message: 'Registration successful', user: newUser })
+    console.log(hashedPassword)
+    try {
+        const newUser = await users.create({ username, password: hashedPassword })
+        console.log(newUser)
+        // sets up session with userId and username
+        req.session.userId = newUser._id
+        req.session.username = username
+        req.session.save()
+        return res.status(200).json({ message: 'Registration successful', user: newUser })
+    } catch (error) {
+        return res.status(400).json({ error: error.message })
+    }
+    c
 
 });
 
@@ -60,3 +66,5 @@ router.post('/logout', async (req, res) => {
         })
     })
 });
+
+module.exports = router;

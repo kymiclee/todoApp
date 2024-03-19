@@ -29,9 +29,6 @@ const todoItemSchema = new Schema({
     }
 })
 
-todoItemSchema.pre('remove', function (next) {
-    console.log('Query validate');
-    next();
-});
+
 
 module.exports = mongoose.model('todoItem', todoItemSchema);

@@ -16,7 +16,10 @@ const todoList = require('./models/todoList')
 const user = require('./models/users')
 
 // importing routes
-const todoRoutes = require('./routes/todoItem');
+const itemRoutes = require('./routes/todoItem');
+const listRoutes = require('./routes/todoList');
+const userRoutes = require('./routes/users');
+
 const { userInfo } = require('os');
 
 //Express Setup
@@ -83,9 +86,10 @@ passport.deserializeUser(function (id, cb) {
         return cb(null, user);
     })
 });
-
 //routes
-app.use('/api/todo', todoRoutes)
+app.use('/api/todo', itemRoutes)
+app.use('/api/todo', listRoutes)
+app.use('/api/todo', userRoutes)
 
 
 const port = process.env.PORT || 3000

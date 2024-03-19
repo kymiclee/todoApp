@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const todoList = require('../models/todoList');
+const todoItem = require('./todoItem')
 
 
 // Create a new todo list
@@ -9,10 +10,10 @@ router.post('/', async (req, res) => {
     // So need to think how to do this 
     // we can use session id to get the user
 
-    const { title, priority } = req.body
-    const { userId } = req.sessions._id
+    const { title } = req.body
+    const { userId } = req.session._id
     try {
-        const newList = await todoList.create({ title, priority, user: userId })
+        const newList = await todoList.create({ title, user: userId })
         return res.status(200).json(newList)
     } catch (error) {
         return res.status(400).json({ error: error.message })
@@ -24,8 +25,8 @@ router.get('/', async (req, res) => {
     // Logic to retrieve all todo lists
     const { userId } = req.sessions._id
     try {
-        const todoLists = await todoList.get({ user: userId })
-        return res.status(200).json(userId)
+        const todoLists = await todoList.find({ user: userId })
+        return res.status(200).json(todoLists)
     } catch (error) {
         return res.status(400).json({ error: error.message })
     }
@@ -66,9 +67,9 @@ router.delete('/:listId', async (req, res) => {
         if (!list) {
             return res.status(400).json('error: List was not found')
         }
-
-        const updatedList = await todoList.findByIdAndDelete(listId, { new: true })
-        return res.status(200).json(updatedList)
+        console.log("about to run find By and delete")
+        await todoList.findByIdAndDelete(listId, { new: true })
+        return res.status(200).json({ message: 'Todo list and associated items deleted successfully' });
     } catch (error) {
         return res.status(400).message({ error: error.message })
     }

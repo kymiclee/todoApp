@@ -1,6 +1,7 @@
 // @ts-nocheck
 const mongoose = require('mongoose');
 const todoItem = require('./todoItem');
+const { ObjectId } = require('mongodb');
 const Schema = mongoose.Schema;
 
 const todoListSchema = new Schema({
@@ -9,22 +10,23 @@ const todoListSchema = new Schema({
         default: '',
         required: [true, 'List name cannot be empty']
     },
-    user: [{
+    user: {
         type: Schema.Types.ObjectId,
         ref: 'user'
-    }]
+    }
 })
 
 // whenever i delete a todoList with findbyIdandDelete, it will use the  pre to delete all the 
 // todo items from the list first with todoId then proceed to delete the list
-todoListSchema.pre('findbyIdandDelete', function (next) {
+// there is no findByIdAndDelete middleware but because it triggers findOneAndDelete, we can just use that
+
+todoListSchema.pre('findOneAndDelete', async function (next) {
     try {
-        todoItem.remove({ todoList: this._id }).exec()
+        await todoItem.deleteMany({ todoList: this._id })
         next()
     } catch (error) {
         next(error)
     }
-
 });
 
 module.exports = mongoose.model('todoList', todoListSchema);
