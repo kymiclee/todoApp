@@ -53,17 +53,19 @@ app.use(passport.initialize());
 app.use(passport.session())
 
 passport.use(new LocalStrategy(
-    function (username, password, done) {
-        User.findOne({ username: username }, function (err, user) {
-            if (err) { return done(err); }
-            if (!user) { return done(null, false); } // User not found
-
-            bcrypt.compare(password, user.password, function (err, isMatch) {
+    async function (username, password, done) {
+        try {
+            const verifyUser = await user.findOne({ username: username }).exec()
+            if (!verifyUser) { return done(null, false); } // User not found
+            bcrypt.compare(password, verifyUser.password, function (err, isMatch) {
                 if (err) { return done(err); }
                 if (!isMatch) { return done(null, false); } // Incorrect password
-                return done(null, user); // Authentication successful
-            });
-        });
+                return done(null, verifyUser); // Authentication successful
+            })
+        } catch (error) {
+            return done(error)
+        }
+
     }
 ));
 
@@ -91,6 +93,12 @@ app.use('/api/todo', itemRoutes)
 app.use('/api/todo', listRoutes)
 app.use('/api/todo', userRoutes)
 
+//handle app error
+app.use((err, req, res, next) => {
+    const { statusCode = 500 } = err;
+    if (!err.message) err.message = 'Oh No, Something Went Wrong!'
+    res.status(statusCode).render('error', { err });
+})
 
 const port = process.env.PORT || 3000
 app.listen(port, () => {

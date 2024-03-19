@@ -1,7 +1,6 @@
 // @ts-nocheck
 const mongoose = require('mongoose');
 const todoItem = require('./todoItem');
-const { ObjectId } = require('mongodb');
 const Schema = mongoose.Schema;
 
 const todoListSchema = new Schema({
@@ -21,6 +20,7 @@ const todoListSchema = new Schema({
 // there is no findByIdAndDelete middleware but because it triggers findOneAndDelete, we can just use that
 
 todoListSchema.pre('findOneAndDelete', async function (next) {
+    console.log('pre schema')
     try {
         await todoItem.deleteMany({ todoList: this._id })
         next()
