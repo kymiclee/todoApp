@@ -1,32 +1,25 @@
 import React from 'react'
 import { useState } from 'react'
-
+import { CssBaseline } from '@mui/material'
+import { Box } from '@mui/material'
 import './App.css'
-import NavBar from './components/NavBar';
-import TodoLists from './components/TodoLists'
-import TodoItems from './components/TodoItems'
+
+import NavBar from './components/NavBar'
+import TodoList from './components/TodoLists'
 
 function App() {
-
   return (
-    <div className='App'>
-      <div className='NavBar'>
-        <NavBar />
-      </div>
-      <div className='dateBox'>
+    <Box maxWidth={1500} mx="auto" minHeight="100vh" display="flex" flexDirection="column">
+      <NavBar />
+      <Box sx={{ flexGrow: 1, display: 'flex', width: '100%' }}>
+        <TodoList />
 
-      </div>
-      <div className="Todo">
-        <div className='TodoList'>
-          <TodoLists />
-        </div>
-        <div className='TodoItems'>
-          <TodoItems />
-        </div>
-      </div>
-    </div>
+        {/* <TodoItems /> */}
+      </Box>
+    </Box>
+  );
+};
 
-  )
-}
+
 
 export default App

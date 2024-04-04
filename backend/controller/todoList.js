@@ -3,8 +3,12 @@ const todoList = require('../models/todoList');
 
 module.exports.getAllLists = async (req, res) => {
     // Logic to retrieve all todo lists
-    const { userId } = req.sessions._id
-    // const userId = "65fa1861cdd084c686bbb713"
+    console.log('req.session.user:', req.session.user)
+    // if (!req.session.user) {
+    //     return res.status(200).json(null)
+    // }
+    const userId = req.session.user.id
+    // const userId = "65fa0ca114a7231d1d2e1388"
     try {
         const todoLists = await todoList.find({ user: userId })
         return res.status(200).json(todoLists)
@@ -15,8 +19,15 @@ module.exports.getAllLists = async (req, res) => {
 
 
 module.exports.createList = async (req, res) => {
-    const { title } = req.body
-    const { userId } = req.session._id
+    var { title } = req.body
+
+    const userId = req.session.user.id
+    console.log(userId)
+    // const userId = "65fa0ca114a7231d1d2e1388"
+    if (title == "") {
+        const count = todoList.countDocuments({ user: userId })
+        title = `Todo List ${count}`
+    }
     // const userId = "65fa1861cdd084c686bbb713"
     try {
         const newList = await todoList.create({ title, user: userId })

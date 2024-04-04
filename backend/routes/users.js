@@ -6,10 +6,10 @@ const { isUsernameUsed } = require('../middleware.js')
 
 const { register, login, logout } = require('../controller/user')
 // Register a new user
-router.post('/register', isUsernameUsed, register);
+router.post('/users/register', isUsernameUsed, register);
 
 // Login a user with local stragegy 
-router.post('/login', passport.authenticate('local'), login);
+router.post('/users/login', passport.authenticate('local'), login);
 
 
 // // Change user password
@@ -18,6 +18,7 @@ router.post('/login', passport.authenticate('local'), login);
 // });
 
 // Logout user 
-router.post('/logout', logout);
+router.post('/users/logout', logout);
 
 module.exports = router;
+

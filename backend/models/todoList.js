@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const todoListSchema = new Schema({
     title: {
         type: String,
-        default: '',
+        default: 'Default List',
         required: [true, 'List name cannot be empty']
     },
     user: {

@@ -6,15 +6,15 @@ const { isLoggedIn } = require('../middleware.js')
 
 
 // Get all todo lists
-router.get('/', getAllLists);
+router.get('/lists', isLoggedIn, getAllLists);
 
 // Create a new todo list
-router.post('/', createList);
+router.post('/lists', isLoggedIn, createList);
 
 // Update a todo list
-router.put('/:listId', updateListName);
+router.put('/list/:listId', isLoggedIn, updateListName);
 
 // Delete a todo list
-router.delete('/:listId', deleteList);
+router.delete('/list/:listId', isLoggedIn, deleteList);
 
 module.exports = router;

@@ -1,21 +1,34 @@
 const express = require('express');
 const todoItem = require('../models/todoItem')
+const todoList = require('../models/todoList');
 
 module.exports.getAllItems = async (req, res) => {
-    const { listId } = req.params
     try {
-        const allTodo = await todoItem.find({ todoList: listId })
+        // if (!req.session.user) {
+        //     return res.status(200).json(null)
+        // } else {
+        const userId = req.session.user.id
+        // const userId = "65fa0ca114a7231d1d2e1388"
+        console.log('New get Request')
+        console.log('userId: ', userId)
+        const todoLists = await todoList.find({ user: userId })
+        console.log('todoLists: ', todoLists)
+        const listsId = await todoLists.map((todoList) => todoList._id)
+        console.log('ListsId : ', listsId)
+        const allTodo = await todoItem.find({ todoList: { $in: listsId } })
+        console.log(allTodo)
         return res.status(200).json(allTodo)
+
     } catch (error) {
         return res.status(400).json({ error: error.message })
     }
-
 }
 
 
 module.exports.createTodoItem = async (req, res) => {
     const { task, priority } = req.body
     const { listId } = req.params
+    // const listId = "6606429f24ba990c28fa4dbe";
     try {
         const newTodo = await todoItem.create({ task, priority, todoList: listId })
         return res.status(200).json(newTodo)

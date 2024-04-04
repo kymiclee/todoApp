@@ -9,6 +9,7 @@ const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt')
+const cors = require('cors')
 
 // importing models
 const todoItem = require('./models/todoItem')
@@ -25,6 +26,8 @@ const { userInfo } = require('os');
 //Express Setup
 const app = express()
 app.use(express.json());
+// app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+
 // app.use(passport.session())
 
 // Session Setup 
@@ -33,7 +36,11 @@ app.use(session({
     secret: 'secret',
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 60000 },
+    cookie: {
+        maxAge: 24 * 60 * 60 * 1000,
+        secure: false,
+        sameSite: 'strict'
+    },
     store: MongoStore.create(
         {
             mongoUrl: dbUrl
@@ -57,15 +64,14 @@ passport.use(new LocalStrategy(
         try {
             const verifyUser = await user.findOne({ username: username }).exec()
             if (!verifyUser) { return done(null, false); } // User not found
-            bcrypt.compare(password, verifyUser.password, function (err, isMatch) {
-                if (err) { return done(err); }
-                if (!isMatch) { return done(null, false); } // Incorrect password
-                return done(null, verifyUser); // Authentication successful
-            })
+            const isMatch = await bcrypt.compare(password, verifyUser.password)
+            if (!isMatch) { return done(null, false); }
+            if (!isMatch) { return done(null, false); } // Incorrect password
+            return done(null, verifyUser); // Authentication successful
+
         } catch (error) {
             return done(error)
         }
-
     }
 ));
 
@@ -100,7 +106,7 @@ app.use((err, req, res, next) => {
     res.status(statusCode).render('error', { err });
 })
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 5000
 app.listen(port, () => {
-    console.log(`todoApp listening on port ${port}`)
+    console.log(`todoApp backend listening on port ${port}`)
 })
