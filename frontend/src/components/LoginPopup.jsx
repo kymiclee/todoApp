@@ -34,11 +34,11 @@ export default function FormDialog() {
         const formData = new FormData(event.currentTarget);
         const formJson = Object.fromEntries(formData.entries());
         // Access the username and password values
-        const username = formJson.username;
-        const password = formJson.password;
+        // const username = formJson.username;
+        // const password = formJson.password;
         // Log username and password for debugging
-        console.log('Username:', username);
-        console.log('Password:', password);
+        // console.log('Username:', username);
+        // console.log('Password:', password);
 
 
         const response = await fetch('/api/todo/users/login', {
@@ -49,12 +49,12 @@ export default function FormDialog() {
             },
             credentials: 'include'
         })
-        console.log('submitting', formJson);
+        // console.log('submitting', formJson);
 
         if (response.ok) {
             // Successful response, handle accordingly
-            const json = await response.json();
-            console.log('Response:', json);
+            // const json = await response.json();
+            // console.log('Response:', json);
             login()
             //window.location.reload();
 

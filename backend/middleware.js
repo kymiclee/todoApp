@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nochec
 const user = require('./models/users')
 module.exports.isUsernameUsed = async (req, res, next) => {
     const { username } = req.body

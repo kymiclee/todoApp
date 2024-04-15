@@ -4,6 +4,7 @@ import NavBar from '../components/NavBar';
 import { useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import TodoList from '../components/TodoLists';
+import TodoItem from '../components/TodoItems';
 const TodoPage = () => {
     const theme = useTheme();
 
@@ -17,12 +18,11 @@ const TodoPage = () => {
     };
 
     return (
-        <div>
-            <Box className='App'>
-                <div className='NavBar'>
-                    <NavBar />
-                </div>
-                {/* <div className="Todo">
+        <Box className='App'>
+            <div className='NavBar'>
+                <NavBar />
+            </div>
+            {/* <div className="Todo">
                     <div className='TodoList'>
                         <TodoLists onSelectList={handleListSelection} />
                     </div>
@@ -30,12 +30,12 @@ const TodoPage = () => {
                         <TodoItems listId={listId} />
                     </div>
                 </div> */}
-                {/* <VerticalTabs /> */}
-                {/* <TodoDisplayList /> */}
-                <TodoList appWidth={appWidth} />
+            {/* <VerticalTabs /> */}
+            {/* <TodoDisplayList /> */}
+            <TodoList />
+            <TodoItem />
 
-            </Box>
-        </div>
+        </Box>
 
     );
 };

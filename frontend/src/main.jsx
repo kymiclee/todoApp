@@ -5,15 +5,18 @@ import './index.css'
 import { TodoListContextProvider } from '../context/TodoListContext.jsx';
 import { TodoItemContextProvider } from '../context/TodoItemContext.jsx';
 import { UserAuthContextProvider } from '../context/UserAuthContext.jsx';
+import { CurrentTodoListProvider } from '../context/CurrentTodoListContext.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <UserAuthContextProvider>
-      <TodoListContextProvider>
-        <TodoItemContextProvider>
-          <App />
-        </TodoItemContextProvider>
-      </TodoListContextProvider>
+      <CurrentTodoListProvider>
+        <TodoListContextProvider>
+          <TodoItemContextProvider>
+            <App />
+          </TodoItemContextProvider>
+        </TodoListContextProvider>
+      </CurrentTodoListProvider>
     </UserAuthContextProvider>
   </React.StrictMode>,
 )

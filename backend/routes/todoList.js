@@ -9,7 +9,7 @@ const { isLoggedIn } = require('../middleware.js')
 router.get('/lists', isLoggedIn, getAllLists);
 
 // Create a new todo list
-router.post('/lists', isLoggedIn, createList);
+router.post('/lists/create', isLoggedIn, createList);
 
 // Update a todo list
 router.put('/list/:listId', isLoggedIn, updateListName);

@@ -1,20 +1,6 @@
 // @ts-nocheck
 import { styled, Drawer as MuiDrawer } from '@mui/material';
 
-// Define the styled Drawer component
-// Define the styled Drawer component
-// const StyledDrawer = styled(MuiDrawer)({
-//     position: "relative", // Set a minimum width
-//     flexShrink: 0,
-//     minWidth: "50%",
-//     "& .MuiDrawer-paper": {// Set a minimum width
-//         minWidth: "50%",
-//         position: "absolute",
-//         transition: "none !important",
-//         width: "50%", // Allow the drawer to expand based on content
-//         maxWidth: "100%", // Set the maximum width to 30% of container width
-//     },
-// });
 const StyledDrawer = styled(MuiDrawer)(({ theme }) => ({
     position: "relative",
     flexShrink: 0,
@@ -25,25 +11,20 @@ const StyledDrawer = styled(MuiDrawer)(({ theme }) => ({
         transition: "none !important",
         width: "auto",
         maxWidth: "100%",
-        height: "100%",
         [theme.breakpoints.up("sm")]: {
-            width: "25%",
-            minWidth: "25%",
+            width: "100%",
+            minWidth: "100%",
         },
     },
     "&.MuiDrawer-docked": {
         flexShrink: 0,
-        width: "25%", // Adjust this value as needed
-        flexBasis: "25%", // Ensure the drawer retains its width in the docked state
-        height: "100%",
+        width: "30%", // Adjust this value as needed
+        flexBasis: "30%", // Ensure the drawer retains its width in the docked state
         position: "relative",
     },
 }));
 
 import { useState, useEffect } from "react";
-
-import { UseTodoListsContext } from "../hooks/UseTodoListsContext";
-import { UseUserAuthContext } from '../hooks/UseUserAuthContext';
 import {
     Box,
     Checkbox,
@@ -60,25 +41,42 @@ import {
     Toolbar,
     Typography,
 } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import Alert from '@mui/material/Alert';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 
-export default function TodoList({ drawerWidth }) {
-    const handleListClick = (id) => {
-        onSelectList(id);
-    };
+import { UseTodoListsContext } from "../hooks/UseTodoListsContext";
+import { UseUserAuthContext } from '../hooks/UseUserAuthContext';
+import { UseCurrentTodoList } from '../hooks/UseCurrentTodoList';
+import CreateNewTodoList from './CreateNewTodoList';
+
+
+export default function TodoList() {
+    // const handleListClick = (id) => {
+    //     onSelectList(id);
+    // };
     const { isAuthenticated } = UseUserAuthContext();
     const { todoLists, dispatch: dispatchList } = UseTodoListsContext()
+    const { state: currentList, dispatch: setCurrentList } = UseCurrentTodoList()
+    const [successAlert, setSuccessAlert] = useState(false)
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const responseList = await fetch('/api/todo/lists', { credentials: 'include' });
-                const dataList = await responseList.json();
-                console.log("Todo Lists");
-                console.log(dataList);
+                const todoList = await responseList.json();
                 if (responseList.ok) {
-                    dispatchList({ type: 'SET_TODOLIST', payload: dataList });
+                    dispatchList({ type: 'SET_TODOLIST', payload: todoList });
+                    if (todoList && todoList.length > 0) {
+                        console.log(todoList[0])
+                        setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoList[0] });
+                        console.log('Payload:', todoList[0]);
+                    } else {
+                        console.error('Todo list is empty or undefined.');
+                    }
                 } else {
-                    console.error('Error:', responseList.status, dataList.error);
+                    console.error('Error:', responseList.status, todoList.error);
                 }
                 // setLoading(false);
             } catch (error) {
@@ -86,7 +84,6 @@ export default function TodoList({ drawerWidth }) {
                 // setLoading(false);
             }
         };
-
         if (isAuthenticated) {
             fetchData();
         } else {
@@ -95,31 +92,94 @@ export default function TodoList({ drawerWidth }) {
         }
     }, [isAuthenticated, dispatchList]);
 
+    const handleSubmit = async (formData) => {
+        if (isAuthenticated) {
+            try {
+                const response = await fetch('/api/todo/lists/create', {
+                    method: 'POST',
+                    body: JSON.stringify(formData),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
 
+                console.log('submitting', formData);
+
+                if (response.ok) {
+                    // Successful response, handle accordingly
+                    const newList = await response.json();
+                    console.log('Response:', newList);
+                    dispatchList({ type: 'CREATE_TODOLIST', payload: newList });
+                    setSuccessAlert(true);
+                } else {
+                    // Handle unsuccessful response (e.g., show error message)
+                    const errorJson = await response.json();
+                    console.error('Error:', response.status, errorJson.error);
+                    alert('Error creating todo list. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // Handle other potential errors here
+            }
+        } else {
+            // Handle case when user is not authenticated
+            alert('User is not authenticated. Please log in.');
+        }
+
+    };
     return (
 
         <StyledDrawer variant="permanent"
         >
-            {/*Empty Toolbar for spacing*/}
-            <Toolbar />
-            <Divider />
+            {successAlert && (
+                <Alert
+                    icon={<CheckIcon fontSize="inherit" />}
+                    severity="success"
+                    action={
+                        <IconButton
+                            aria-label="close"
+                            color="inherit"
+                            size="small"
+                            onClick={() => {
+                                setSuccessAlert(false);
+                            }}
+                        >
+                            <CloseIcon fontSize="inherit" />
+                        </IconButton>
+                    }
+                >
+                    New todoList created
+                </Alert>
+            )}
+
             <List>
+                <ListItem key={1} disablePadding sx={{ justifyContent: 'space-between' }} >
+                    <CreateNewTodoList onSubmit={handleSubmit} />
+                </ListItem>
+                <Divider />
                 {todoLists && todoLists.map((todoList) => (
-                    <ListItem key={todoList._id} disablePadding>
-                        {console.log(todoList._id)}
+                    <ListItem key={todoList._id} disablePadding >
                         <ListItemButton
                             onClick={() => {
-                                // setCurrentList(todoList.id);
+                                setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoList });
+                                console.log('selected: ', todoList)
                             }}
-                        // selected={currentList === todoList.id}
+                            selected={currentList === todoList._id}
+                            sx={{
+                                backgroundColor: currentList === todoList._id ? '#FF0000' : 'inherit', // Change background color when selected
+                                '&:hover': {
+                                    backgroundColor: currentList === todoList._id ? '#FF0000' : 'rgba(0, 0, 0, 0.08)', // Change hover color when selected
+                                },
+                            }}
                         >
-                            <ListItemText sx={{ ml: 0.5 }} primary={todoList.title} />
-                        </ListItemButton>
+                            <ListItemText sx={{ ml: 0.5, p: 0.6 }} primary={todoList.title} />
+                        </ListItemButton >
                     </ListItem>
 
                 ))}
             </List>
-        </StyledDrawer>
+        </StyledDrawer >
 
     )
 }

@@ -20,7 +20,6 @@ module.exports.getAllLists = async (req, res) => {
 
 module.exports.createList = async (req, res) => {
     var { title } = req.body
-
     const userId = req.session.user.id
     console.log(userId)
     // const userId = "65fa0ca114a7231d1d2e1388"

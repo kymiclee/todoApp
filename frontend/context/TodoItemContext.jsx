@@ -12,7 +12,7 @@ function TodoItemReducer(state, action) {
             }
         case 'CREATE_TODOITEM':
             return {
-                workouts: [action.payload, ...state.todoItems]
+                todoItems: [action.payload, ...state.todoItems]
             }
         case 'DELETE_TODOITEM':
             return {

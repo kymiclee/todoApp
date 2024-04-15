@@ -16,7 +16,10 @@ export const TodoListReducer = (state, action) => {
             }
         case 'DELETE_TODOLIST':
             return {
+
                 todoLists: state.todoLists.filter(todolist => todolist._id !== action.payload._id)
+
+
             }
         case 'PATCH_TODOLIST':
             return {

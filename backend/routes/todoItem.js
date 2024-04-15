@@ -4,10 +4,10 @@ const { getAllItems, createTodoItem, updateTodoItem, deleteTodoItem } = require(
 const { isLoggedIn } = require('../middleware.js')
 
 // Get all todo items in a todo list
-router.get('/items', getAllItems);
+router.get('/items/:listId', getAllItems);
 
 // Create a new todo item
-router.post('/:listId', createTodoItem);
+router.post('/items/:listId', createTodoItem);
 
 // Update a todo item in a todo list
 router.put('/:listId/:itemId', updateTodoItem);
