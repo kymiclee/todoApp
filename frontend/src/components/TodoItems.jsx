@@ -6,6 +6,7 @@ import {
     Divider,
     Drawer,
     FormControl,
+    FormControlLabel,
     FormHelperText,
     IconButton,
     Input,
@@ -26,14 +27,15 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { UseTodoItemsContext } from "../hooks/UseTodoItemsContext";
 import { UseCurrentTodoList } from '../hooks/UseCurrentTodoList';
 import { UseUserAuthContext } from '../hooks/UseUserAuthContext';
-
+import TodoItemsDisplay from '../components/TodoItemsDisplay'
 
 export default function TodoItem() {
     const { isAuthenticated } = UseUserAuthContext();
     const { todoItems, dispatch } = UseTodoItemsContext()
-    const { state: currentList, dispatch: modifyCurrentList } = UseCurrentTodoList()
+    const { state: currentList, dispatch: setCurrentList } = UseCurrentTodoList()
 
     useEffect(() => {
+
         const fetchTodoItem = async () => {
             const listId = currentList._id
             const response = await fetch(`api/todo/items/${listId}`)
@@ -65,6 +67,7 @@ export default function TodoItem() {
             if (response.ok) {
                 console.log('response ok')
                 dispatch({ type: 'CREATE_TODOITEM', payload: data })
+                // setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: currentList })
                 console.log(todoItems)
             } else {
                 const errorJson = await response.json();
@@ -75,6 +78,30 @@ export default function TodoItem() {
         }
     }
 
+    const DeleteItem = async (itemId) => {
+        try {
+            console.log(itemId)
+            const response = await fetch(`api/todo/items/${currentList._id}/${itemId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+
+            if (response.ok) {
+                console.log('response ok')
+                console.log("deleting item with id of ", itemId)
+                dispatch({ type: 'DELETE_TODOITEM', payload: itemId })
+
+                console.log(todoItems)
+            } else {
+                const errorJson = await response.json();
+                console.error('Error:', response.status, errorJson.error);
+            }
+        } catch (error) {
+            console.log({ error: error.message })
+        }
+    }
     return (
         <Box component="div" sx={{ backgroundColor: 'white', width: '70%' }}>
             <List>
@@ -120,22 +147,10 @@ export default function TodoItem() {
                         />
                     </FormControl>
                 </ListItem>
-                {todoItems && todoItems.map((todoItem) => (
-                    <ListItem key={todoItem._id} disablePadding >
-                        {console.log(todoItem._id)}
-                        <ListItemText sx={{ ml: 0.5, p: 0.6 }} primary={todoItem.task} />
-                    </ListItem>
+                {todoItems && <TodoItemsDisplay todoItems={todoItems} DeleteItem={DeleteItem} />}
 
-                ))}
             </List>
         </Box>
-
-
-
-
-
-
-
 
     )
 }

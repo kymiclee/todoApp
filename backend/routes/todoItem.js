@@ -10,10 +10,10 @@ router.get('/items/:listId', getAllItems);
 router.post('/items/:listId', createTodoItem);
 
 // Update a todo item in a todo list
-router.put('/:listId/:itemId', updateTodoItem);
+router.put('/items/:listId/:itemId', updateTodoItem);
 
 // Delete a todo item from a todo list
-router.delete('/:listId/:itemId', deleteTodoItem);
+router.delete('/items/:listId/:itemId', deleteTodoItem);
 
 
 module.exports = router;

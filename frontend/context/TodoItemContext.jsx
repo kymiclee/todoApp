@@ -16,7 +16,7 @@ function TodoItemReducer(state, action) {
             }
         case 'DELETE_TODOITEM':
             return {
-                todoItems: state.todoItems.filter(todoItem => todoItem._id !== action.payload._id)
+                todoItems: state.todoItems.filter(todoItem => todoItem._id !== action.payload)
             }
         case 'PATCH_TODOITEM':
             return {
