@@ -159,7 +159,7 @@ export default function TodoList() {
                 </ListItem>
                 <Divider />
                 {todoLists && todoLists.map((todoList) => (
-                    <ListItem key={todoList._id} disablePadding >
+                    <ListItem key={todoList._id} disablePadding  >
                         <ListItemButton
                             onClick={() => {
                                 setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoList });

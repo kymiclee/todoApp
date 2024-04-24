@@ -30,10 +30,10 @@ import { UseUserAuthContext } from '../hooks/UseUserAuthContext';
 import TodoItemsDisplay from '../components/TodoItemsDisplay'
 
 export default function TodoItem() {
-    const { isAuthenticated } = UseUserAuthContext();
-    const { todoItems, dispatch } = UseTodoItemsContext()
-    const { state: currentList, dispatch: setCurrentList } = UseCurrentTodoList()
-
+    const { isAuthenticated } = UseUserAuthContext()// is user logged in 
+    const { todoItems, dispatch } = UseTodoItemsContext() // useContext for all todo list for user
+    const { state: currentList, dispatch: setCurrentList } = UseCurrentTodoList() //id of current list
+    const [editId, setEditId] = useState(); // contain item id to display the edit button
     useEffect(() => {
 
         const fetchTodoItem = async () => {
@@ -77,7 +77,31 @@ export default function TodoItem() {
             console.log({ error: error.message })
         }
     }
+    const EditItem = async (itemId, formData) => {
+        try {
+            console.log(itemId)
+            const response = await fetch(`api/todo/items/${currentList._id}/${itemId}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData)
+            })
 
+            if (response.ok) {
+                console.log('response ok')
+                console.log("Editing item with id of ", itemId)
+                dispatch({ type: 'PATCH_TODOITEM', payload: itemId })
+
+                console.log(todoItems)
+            } else {
+                const errorJson = await response.json();
+                console.error('Error:', response.status, errorJson.error);
+            }
+        } catch (error) {
+            console.log({ error: error.message })
+        }
+    }
     const DeleteItem = async (itemId) => {
         try {
             console.log(itemId)
@@ -146,9 +170,18 @@ export default function TodoItem() {
                             }
                         />
                     </FormControl>
-                </ListItem>
-                {todoItems && <TodoItemsDisplay todoItems={todoItems} DeleteItem={DeleteItem} />}
-
+                </ListItem >
+                {todoItems && todoItems.map((todoItem) => (
+                    <TodoItemsDisplay
+                        key={todoItem._id}
+                        todoItem={todoItem}
+                        DeleteItem={DeleteItem}
+                        EditItem={EditItem}
+                        editId={editId}
+                        setEditId={setEditId}
+                    />
+                ))
+                }
             </List>
         </Box>
 
