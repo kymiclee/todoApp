@@ -46,7 +46,7 @@ module.exports.updateListName = async (req, res) => {
         if (!list) {
             return res.status(400).json('error: List was not found')
         }
-        const updatedList = await todoList.findByIdAndUpdate(listId, updateData, { new: true })
+        const updatedList = await todoList.findByIdAndUpdate(listId, { updateData }, { new: true })
         return res.status(200).json(updatedList)
     } catch (error) {
         return res.status(400).message({ error: error.message })

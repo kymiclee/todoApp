@@ -16,6 +16,7 @@ import {
     ListItem,
     ListItemButton,
     ListItemIcon,
+    ListItemSecondaryAction,
     ListItemText,
     TextField,
     Toolbar,
@@ -23,80 +24,90 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 
 export default function TodoList({ todoItem, DeleteItem, EditItem, editId, setEditId }) {
-    const [buttonClicked, setButtonCLicked] = useState(false);
+    const [editButtonClicked, setEditButtonClicked] = useState(false);
     const [editValue, setEditValue] = useState(todoItem.task);
-    const [originalValue] = useState(todoItem.task);
+    const [originalValue, setOriginalValue] = useState(todoItem.task);
+    const [checkBox, setCheckBox] = useState(false)
 
-    const handleEdit = () => {
-        setIsEditing(true);
+
+    const handleSelectListItem = () => {
+        setEditId(todoItem._id);
     };
 
-    const handleSave = () => {
-        editItem(todoItem._id, editValue);
-        setIsEditing(false);
+    const handleChange = (e) => {
+        setEditValue(e.target.value);
+    };
+
+    const handleEditSubmit = (e) => {
+        setEditButtonClicked(true); // Set edit button clicked to true
+        console.log(editValue);
+        const data = { task: editValue }; // Use the current value of editValue directly
+        EditItem(todoItem._id, data);
+        setOriginalValue(editValue); // Update originalValue after the edit is submitted
+        setEditButtonClicked(false); // Reset edit button clicked state after submission
+    };
+
+    const handleBlur = () => {
+        if (!editButtonClicked && originalValue !== editValue) {
+            setEditValue(originalValue);
+        }
+        setEditButtonClicked(false);
     };
 
     return (
         <>
             <ListItem
+                sx={{ height: "15%" }}
                 key={todoItem._id}
-                onClick={() => { setEditId(todoItem._id), console.log(todoItem._id), setEditValue(todoItem.task) }}
-                secondaryAction={
+                onClick={handleSelectListItem}
+                onBlur={handleBlur}
+            >
+                <ListItemIcon>
+                    <Checkbox
+                        edge="start"
+                        aria-label="checkBox"
+                    // onClick={(e) => {
+                    //     // Prevent the click event from propagating to the ListItem
+                    //     e.stopPropagation();
+                    //     setCheckBox(true)
+
+                    // }}
+                    />
+                </ListItemIcon>
+
+                <TextField
+                    variant="standard"
+                    size="medium"
+                    value={editValue}
+                    inputProps={{ style: { fontSize: '16px' } }}
+                    sx={{ width: '100%' }}
+                    onChange={handleChange}
+                />
+                {editId === todoItem._id && (
+                    <IconButton onMouseDown={handleEditSubmit}>
+                        <EditIcon />
+                    </IconButton>
+                )}
+                <ListItemSecondaryAction>
                     <IconButton edge="end" aria-label="delete"
                         type="submit"
-                        sx={{ p: '10px' }}
+                        sx={{}}
                         onClick={() => {
                             DeleteItem(todoItem._id);
                         }}>
                         <DeleteIcon />
                     </IconButton>
-                }>
-                <FormControl style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-                    <FormControlLabel control={<Checkbox />} />
-                    <Input
-                        id="editTodo"
-                        aria-describedby="my-helper-text"
-                        maxRows={1}
-                        sx={{ fontSize: '18px', mb: 2.5, width: '70%' }}
-                        defaultValue={editValue}
-                        onBlur={() => {
-                            // if (!buttonClicked) {
-                            //     setEditId(null);
-                            //     setEditValue(originalValue)
-                            // }
-                        }}
-                        onChange={(e) => { setEditValue(e.target.value) }}
-
-                    />
-                    {editId && editId == todoItem._id && (
-                        <Button
-                            variant="contained"
-                            sx={{ m: 1, width: '10%', height: '10%' }}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setButtonCLicked(true)
-                                setEditValue(prevValue => {
-                                    console.log('clicking edit')
-                                    console.log('editValue: ', prevValue)
-                                    const data = { task: prevValue }
-                                    console.log(data)
-                                    EditItem(todoItem._id, data)
-
-                                })
-                                setEditId(null);
-                            }}
-                        >Edit</Button>
-                    )}
-
-                </FormControl>
+                </ListItemSecondaryAction>
             </ListItem >
 
         </>
     );
 };
+

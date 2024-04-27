@@ -34,19 +34,27 @@ module.exports.updateTodoItem = async (req, res) => {
     // Logic to update a todo item in a todo list
 
     const { itemId } = req.params
-    const { task } = req.body
-    console.log(itemId)
+    const { task, isCompleted } = req.body
+    console.log(task, isCompleted)
     try {
         const todo = await todoItem.findById(itemId)
         if (!todo) {
             return res.status(404).json({ error: 'Todo item not found in the specified list' });
         }
-        const updateTodo = await todoItem.findByIdAndUpdate(itemId, task, { new: true })
+        const updateData = {}
+        if (task != undefined) {
+            updateData.task = task
+        }
+        if (isCompleted) {
+            updateData.isCompleted = isCompleted
+        }
+        const updateTodo = await todoItem.findByIdAndUpdate(itemId, updateData, { new: true })
         return res.status(200).json(updateTodo)
     } catch (error) {
         return res.status(400).json({ error: error.message })
     }
 }
+
 
 module.exports.deleteTodoItem = async (req, res) => {
     const { itemId } = req.params

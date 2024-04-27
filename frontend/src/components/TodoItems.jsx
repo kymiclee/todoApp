@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 import { UseTodoItemsContext } from "../hooks/UseTodoItemsContext";
 import { UseCurrentTodoList } from '../hooks/UseCurrentTodoList';
@@ -33,7 +34,9 @@ export default function TodoItem() {
     const { isAuthenticated } = UseUserAuthContext()// is user logged in 
     const { todoItems, dispatch } = UseTodoItemsContext() // useContext for all todo list for user
     const { state: currentList, dispatch: setCurrentList } = UseCurrentTodoList() //id of current list
-    const [editId, setEditId] = useState(); // contain item id to display the edit button
+    const [editId, setEditId] = useState(''); // contain item id to display the edit button
+    const [title, setTitle] = useState(currentList.title);
+    const [newTask, setNewTask] = useState('')
     useEffect(() => {
 
         const fetchTodoItem = async () => {
@@ -91,9 +94,8 @@ export default function TodoItem() {
             if (response.ok) {
                 console.log('response ok')
                 console.log("Editing item with id of ", itemId)
-                dispatch({ type: 'PATCH_TODOITEM', payload: itemId })
-
-                console.log(todoItems)
+                const updatedItem = await response.json();
+                dispatch({ type: 'PATCH_TODOITEM', payload: updatedItem })
             } else {
                 const errorJson = await response.json();
                 console.error('Error:', response.status, errorJson.error);
@@ -126,10 +128,34 @@ export default function TodoItem() {
             console.log({ error: error.message })
         }
     }
+
+    const EditTitle = async (formData) => {
+        try {
+            const response = await fetch(`api/todo/list/${currentList._id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData)
+            })
+
+            if (response.ok) {
+                const updatedTitle = await response.json();
+                console.log('response ok')
+                console.log("Editing item with id of ", updatedTitle._id)
+
+                dispatch({ type: 'PATCH_TODOLIST', payload: updatedTitle })
+            } else {
+                const errorJson = await response.json();
+                console.error('Error:', response.status, errorJson.error);
+            }
+        } catch (error) {
+            console.log({ error: error.message })
+        }
+    }
     return (
         <Box component="div" sx={{ backgroundColor: 'white', width: '70%' }}>
             <List>
-
                 <ListItem
                     secondaryAction={
                         <IconButton edge="end" aria-label="delete">
@@ -137,39 +163,67 @@ export default function TodoItem() {
                         </IconButton>
                     }
                 >
+                    {/* {console.log(title)} */}
                     {currentList && currentList.title && (
-                        <ListItemText primaryTypographyProps={{ fontSize: '30px' }} primary={currentList.title} />
+                        <TextField
+                            variant="outlined"
+                            size="medium"
+                            value={currentList.title}
+                            inputProps={{ style: { fontSize: '26px' } }}
+                            sx={{ width: '100%' }}
+                            onChange={(e) => { setTitle(e.target.value) }}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="start"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setTitle(prevValue => {
+                                                console.log('clicking edit Title')
+                                                console.log('editTitle: ', prevValue)
+                                                const data = { title: prevValue }
+                                                console.log(data)
+                                                EditTitle(data)
+                                            })
+                                        }}>
+                                        <EditIcon />
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
                     )}
-
                 </ListItem>
                 <Divider />
                 <ListItem sx={{ paddingTop: '20px' }}>
-                    <FormControl fullWidth>
-                        <InputLabel htmlFor="newTodo">New Todo Item</InputLabel>
-                        <Input
-                            id="newTodo"
-                            aria-describedby="my-helper-text"
-                            maxRows={1}
-                            sx={{ fontSize: '18px' }}
-                            endAdornment={ // Use endAdornment prop instead of InputAdornment
+                    <TextField
+                        label="New Todo Item"
+                        variant="standard"
+                        maxRows={1}
+                        value={newTask}
+                        inputProps={{ style: { fontSize: '22px' } }}
+                        sx={{ width: '100%', marginTop: '-15px' }}
+                        onChange={(e) => { setNewTask(e.target.value) }}
+                        InputProps={{
+                            endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton
                                         type="submit"
                                         color="primary"
-                                        sx={{ p: '10px' }}
+                                        sx={{ fontSize: '18px' }}
                                         aria-label="directions"
                                         onClick={() => {
-                                            const inputValue = document.getElementById("newTodo").value;
-                                            const data = { task: inputValue }
+                                            const data = { task: newTask }
+                                            console.log(newTask)
                                             NewTodohandleSubmit(data);
+                                            setNewTask('')
                                         }}
                                     >
                                         <SendIcon />
                                     </IconButton>
                                 </InputAdornment>
-                            }
-                        />
-                    </FormControl>
+                            )
+                        }}
+                    />
+
                 </ListItem >
                 {todoItems && todoItems.map((todoItem) => (
                     <TodoItemsDisplay
@@ -183,7 +237,7 @@ export default function TodoItem() {
                 ))
                 }
             </List>
-        </Box>
+        </Box >
 
     )
 }
