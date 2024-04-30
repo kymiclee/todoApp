@@ -38,18 +38,19 @@ module.exports.createList = async (req, res) => {
 
 module.exports.updateListName = async (req, res) => {
     // Logic to update a todo list
-    const updateData = req.body
+    const { title } = req.body
     const { listId } = req.params
-
+    console.log('listId from backend:', listId)
+    console.log('data send to backend: ', title)
     try {
         const list = await todoList.findById(listId)
         if (!list) {
             return res.status(400).json('error: List was not found')
         }
-        const updatedList = await todoList.findByIdAndUpdate(listId, { updateData }, { new: true })
+        const updatedList = await todoList.findByIdAndUpdate(listId, { title }, { new: true })
         return res.status(200).json(updatedList)
     } catch (error) {
-        return res.status(400).message({ error: error.message })
+        return res.status(400).json({ error: error.message })
     }
 }
 

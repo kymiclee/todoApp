@@ -70,7 +70,7 @@ export default function TodoList() {
                     dispatchList({ type: 'SET_TODOLIST', payload: todoList });
                     if (todoList && todoList.length > 0) {
                         console.log(todoList[0])
-                        setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoList[0] });
+                        setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoList[0] })
                         console.log('Payload:', todoList[0]);
                     } else {
                         console.error('Todo list is empty or undefined.');
@@ -128,6 +128,7 @@ export default function TodoList() {
         }
 
     };
+
     return (
 
         <StyledDrawer variant="permanent"

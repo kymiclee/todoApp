@@ -34,7 +34,7 @@ export default function TodoList({ todoItem, DeleteItem, EditItem, editId, setEd
     const [editButtonClicked, setEditButtonClicked] = useState(false);
     const [editValue, setEditValue] = useState(todoItem.task);
     const [originalValue, setOriginalValue] = useState(todoItem.task);
-    const [checkBox, setCheckBox] = useState(false)
+    const [checkBox, setCheckBox] = useState(todoItem.isCompleted)
 
 
     const handleSelectListItem = () => {
@@ -52,6 +52,7 @@ export default function TodoList({ todoItem, DeleteItem, EditItem, editId, setEd
         EditItem(todoItem._id, data);
         setOriginalValue(editValue); // Update originalValue after the edit is submitted
         setEditButtonClicked(false); // Reset edit button clicked state after submission
+
     };
 
     const handleBlur = () => {
@@ -60,6 +61,17 @@ export default function TodoList({ todoItem, DeleteItem, EditItem, editId, setEd
         }
         setEditButtonClicked(false);
     };
+    const handleCheckBox = () => {// still need work
+        console.log('checkbox is ', checkBox)
+        checkBox ? setCheckBox(false) : setCheckBox(true);
+        const response = await fetch(`api/todo/items/${currentList._id}`, {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+        })
+    }
 
     return (
         <>
@@ -71,14 +83,10 @@ export default function TodoList({ todoItem, DeleteItem, EditItem, editId, setEd
             >
                 <ListItemIcon>
                     <Checkbox
+                        checked={checkBox}
                         edge="start"
                         aria-label="checkBox"
-                    // onClick={(e) => {
-                    //     // Prevent the click event from propagating to the ListItem
-                    //     e.stopPropagation();
-                    //     setCheckBox(true)
-
-                    // }}
+                        onMouseDown={handleCheckBox}
                     />
                 </ListItemIcon>
 
@@ -89,12 +97,14 @@ export default function TodoList({ todoItem, DeleteItem, EditItem, editId, setEd
                     inputProps={{ style: { fontSize: '16px' } }}
                     sx={{ width: '100%' }}
                     onChange={handleChange}
+                    InputProps={{
+                        endAdornment: editId === todoItem._id && (
+                            <IconButton onMouseDown={handleEditSubmit}>
+                                <EditIcon />
+                            </IconButton>
+                        )
+                    }}
                 />
-                {editId === todoItem._id && (
-                    <IconButton onMouseDown={handleEditSubmit}>
-                        <EditIcon />
-                    </IconButton>
-                )}
                 <ListItemSecondaryAction>
                     <IconButton edge="end" aria-label="delete"
                         type="submit"
