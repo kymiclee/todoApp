@@ -1,5 +1,0 @@
-{
-    "compilerOptions": {
-        "allowJs": false // Set this to false to disable type checking for JavaScript files
-    }
-}
