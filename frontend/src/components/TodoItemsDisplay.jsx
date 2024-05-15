@@ -1,41 +1,14 @@
 // @ts-nocheck
-import {
-    Box,
-    Button,
-    Checkbox,
-    Divider,
-    Drawer,
-    FormControl,
-    FormControlLabel,
-    FormHelperText,
-    IconButton,
-    Input,
-    InputLabel,
-    InputAdornment,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemSecondaryAction,
-    ListItemText,
-    TextField,
-    Toolbar,
-    Typography,
-} from '@mui/material';
-import SendIcon from '@mui/icons-material/Send';
+import { useState, useEffect } from 'react';
+import { Checkbox, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
-
-import { useState, useEffect } from 'react';
-
-
-export default function TodoList({ todoItem, DeleteItem, EditItem, editId, setEditId }) {
+export default function TodoList({ todoItem, handleDeleteItem, handleEditItem, editId, setEditId, putData }) {
     const [editButtonClicked, setEditButtonClicked] = useState(false);
     const [editValue, setEditValue] = useState(todoItem.task);
     const [originalValue, setOriginalValue] = useState(todoItem.task);
     const [checkBox, setCheckBox] = useState(todoItem.isCompleted)
-
 
     const handleSelectListItem = () => {
         setEditId(todoItem._id);
@@ -49,7 +22,7 @@ export default function TodoList({ todoItem, DeleteItem, EditItem, editId, setEd
         setEditButtonClicked(true); // Set edit button clicked to true
         console.log(editValue);
         const data = { task: editValue }; // Use the current value of editValue directly
-        EditItem(todoItem._id, data);
+        handleEditItem(todoItem._id, data);
         setOriginalValue(editValue); // Update originalValue after the edit is submitted
         setEditButtonClicked(false); // Reset edit button clicked state after submission
 
@@ -61,17 +34,23 @@ export default function TodoList({ todoItem, DeleteItem, EditItem, editId, setEd
         }
         setEditButtonClicked(false);
     };
+
     const handleCheckBox = () => {// still need work
         console.log('checkbox is ', checkBox)
-        checkBox ? setCheckBox(false) : setCheckBox(true);
-        const response = await fetch(`api/todo/items/${currentList._id}`, {
-            method: "POST", 
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
-        })
+        const updatedCheckBox = !checkBox; // Toggle the checkbox value
+        console.log(updatedCheckBox)
+        const check = { isCompleted: updatedCheckBox }
+        console.log(check)
+        handleEditItem(todoItem._id, check);
     }
+
+    useEffect(() => {
+        if (putData && putData._id === todoItem._id) {
+            setCheckBox(putData.isCompleted);
+            setEditValue(putData.task)
+            setOriginalValue(putData.task)
+        }
+    }, [putData, todoItem._id]);
 
     return (
         <>
@@ -94,7 +73,13 @@ export default function TodoList({ todoItem, DeleteItem, EditItem, editId, setEd
                     variant="standard"
                     size="medium"
                     value={editValue}
-                    inputProps={{ style: { fontSize: '16px' } }}
+                    inputProps={{
+                        style: {
+                            fontSize: '16px',
+                            textDecoration: checkBox ? 'line-through' : 'none',
+                            color: checkBox ? 'grey' : 'black'
+                        }
+                    }}
                     sx={{ width: '100%' }}
                     onChange={handleChange}
                     InputProps={{
@@ -108,9 +93,9 @@ export default function TodoList({ todoItem, DeleteItem, EditItem, editId, setEd
                 <ListItemSecondaryAction>
                     <IconButton edge="end" aria-label="delete"
                         type="submit"
-                        sx={{}}
+                        sx={{ opacity: checkBox ? '1' : '0.5' }}
                         onClick={() => {
-                            DeleteItem(todoItem._id);
+                            handleDeleteItem(todoItem._id);
                         }}>
                         <DeleteIcon />
                     </IconButton>

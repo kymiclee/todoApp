@@ -51,83 +51,55 @@ import { UseUserAuthContext } from '../hooks/UseUserAuthContext';
 import { UseCurrentTodoList } from '../hooks/UseCurrentTodoList';
 import CreateNewTodoList from './CreateNewTodoList';
 
+import usePost from "../hooks/API/PostHook";
+import useGet from "../hooks/API/GetHook";
+import usePut from "../hooks/API/PutHook";
 
 export default function TodoList() {
-    // const handleListClick = (id) => {
-    //     onSelectList(id);
-    // };
     const { isAuthenticated } = UseUserAuthContext();
     const { todoLists, dispatch: dispatchList } = UseTodoListsContext()
     const { state: currentList, dispatch: setCurrentList } = UseCurrentTodoList()
     const [successAlert, setSuccessAlert] = useState(false)
+    const { fetchData, data: getData, loading: getLoading, error: getError } = useGet()
+    const { postFetch, data: postData, error: postError } = usePost();
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const responseList = await fetch('/api/todo/lists', { credentials: 'include' });
-                const todoList = await responseList.json();
-                if (responseList.ok) {
-                    dispatchList({ type: 'SET_TODOLIST', payload: todoList });
-                    if (todoList && todoList.length > 0) {
-                        console.log(todoList[0])
-                        setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoList[0] })
-                        console.log('Payload:', todoList[0]);
-                    } else {
-                        console.error('Todo list is empty or undefined.');
-                    }
-                } else {
-                    console.error('Error:', responseList.status, todoList.error);
-                }
-                // setLoading(false);
-            } catch (error) {
-                console.error('Error:', error);
-                // setLoading(false);
-            }
-        };
+        const fetchTodoList = async () => {
+            await fetchData('/lists', { credentials: 'include' })
+        }
         if (isAuthenticated) {
-            fetchData();
+            fetchTodoList()
         } else {
-            // Clear todo lists and items when user logs out
             dispatchList({ type: 'SET_TODOLIST', payload: [] });
         }
-    }, [isAuthenticated, dispatchList]);
+    }, [isAuthenticated, dispatchList])
 
-    const handleSubmit = async (formData) => {
-        if (isAuthenticated) {
-            try {
-                const response = await fetch('/api/todo/lists/create', {
-                    method: 'POST',
-                    body: JSON.stringify(formData),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    credentials: 'include'
-                });
-
-                console.log('submitting', formData);
-
-                if (response.ok) {
-                    // Successful response, handle accordingly
-                    const newList = await response.json();
-                    console.log('Response:', newList);
-                    dispatchList({ type: 'CREATE_TODOLIST', payload: newList });
-                    setSuccessAlert(true);
-                } else {
-                    // Handle unsuccessful response (e.g., show error message)
-                    const errorJson = await response.json();
-                    console.error('Error:', response.status, errorJson.error);
-                    alert('Error creating todo list. Please try again.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                // Handle other potential errors here
-            }
+    useEffect(() => {
+        dispatchList({ type: 'SET_TODOLIST', payload: getData });
+        if (getData && getData.length > 0) {
+            console.log(getData[0])
+            setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: getData[0] })
+            console.log('Payload:', getData[0]);
         } else {
-            // Handle case when user is not authenticated
-            alert('User is not authenticated. Please log in.');
+            console.error('Todo list is empty or undefined.');
         }
 
-    };
+    }, [getData])
+    const handleNewList = async (formData) => {
+        if (isAuthenticated) {
+            await postFetch('/lists/create', formData)
+        } else {
+            alert('User is not authenticated. Please log in.');
+        }
+    }
+    useEffect(() => {
+        if (postData) {
+            console.log('Response:', postData);
+            dispatchList({ type: 'CREATE_TODOLIST', payload: postData });
+            setSuccessAlert(true);
+        }
+
+    }, [postData])
 
     return (
 
@@ -156,7 +128,7 @@ export default function TodoList() {
 
             <List>
                 <ListItem key={1} disablePadding sx={{ justifyContent: 'space-between' }} >
-                    <CreateNewTodoList onSubmit={handleSubmit} />
+                    <CreateNewTodoList onSubmit={handleNewList} />
                 </ListItem>
                 <Divider />
                 {todoLists && todoLists.map((todoList) => (

@@ -45,7 +45,7 @@ module.exports.updateTodoItem = async (req, res) => {
         if (task != undefined) {
             updateData.task = task
         }
-        if (isCompleted) {
+        if (isCompleted != undefined) {
             updateData.isCompleted = isCompleted
         }
         const updateTodo = await todoItem.findByIdAndUpdate(itemId, updateData, { new: true })
