@@ -25,11 +25,22 @@ export default function TodoItem() {
     const [editTitle, setEditTitle] = useState(currentList.title || '')
     const [originalTitle, setOriginalTitle] = useState(currentList.title || '')
     const [editTitleButtonClicked, setEditTitleButtonClicked] = useState(false)
-    const { postFetch, data: postData, error: postError } = usePost();
-    const { deleteFetch, error: deleteError } = useDelete()
-    const { putFetch, data: putData, error } = usePut()
-    const [loading, setLoading] = useState(false)
+    const { postFetch, data: postData, loading: postLoading, error: postError } = usePost();
+    const { deleteFetch, loading: deleteLoading, error: deleteError } = useDelete()
+    const { putFetch, data: putData, loading: putLoading, error } = usePut()
     const { fetchData, data: getData, loading: getLoading, error: getError } = useGet()
+    const [loading, setLoading] = useState(false)
+
+
+    useEffect(() => {
+        if (getLoading || putLoading || postLoading || deleteLoading) {
+            setLoading(true)
+            console.log('loading is true')
+        } else {
+            setLoading(false)
+            console.log('loading is false')
+        }
+    }, [getLoading, putLoading, postLoading, deleteLoading])
 
     useEffect(() => {
         const fetchTodoItem = async () => {
@@ -77,52 +88,37 @@ export default function TodoItem() {
     }
     const NewTodohandleSubmit = async (formData) => {
         try {
-            setLoading(true)
             await postFetch(`/items/${currentList._id}`, formData);
-            console.log(postData)
-
         } catch (error) {
             console.log({ error: error.message });
-        } finally {
-            setLoading(false)
         }
     };
     const handleEditItem = async (itemId, formData) => {
         try {
-            setLoading(true)
             await putFetch(`/items/${currentList._id}/${itemId}`, formData);
         } catch (error) {
             console.log({ error: error.message });
-        } finally {
-            setLoading(false)
         }
     }
 
     const handleDeleteItem = async (itemId) => {
         try {
             console.log("delete item with id of : ", itemId)
-            setLoading(true)
             await deleteFetch(`/items/${currentList._id}/${itemId}`);
             dispatchItems({ type: 'DELETE_TODOITEM', payload: itemId })
         } catch (error) {
             console.log({ error: error.message });
-        } finally {
-            setLoading(false)
         }
     }
     const handleEditTitle = async (formData) => {
         try {
-            setLoading(true)
             await putFetch(`/list/${currentList._id}`, formData);
         } catch (error) {
             console.log({ error: error.message });
-        } finally {
-            setLoading(false)
         }
     }
     const handleDeleteList = async () => {
         try {
-            setLoading(true)
             await deleteFetch(`/list/${currentList._id}`);
             dispatchItems({ type: 'DELETE_TODOITEM', payload: currentList._id })
             dispatchList({ type: 'DELETE_TODOLIST', payload: currentList })
@@ -135,8 +131,6 @@ export default function TodoItem() {
 
         } catch (error) {
             console.log({ error: error.message });
-        } finally {
-            setLoading(false)
         }
     }
 
@@ -159,8 +153,6 @@ export default function TodoItem() {
         }
         setEditTitleButtonClicked(false);
     };
-
-
 
     return (
         <Box component="div" sx={{ backgroundColor: 'white', width: '70%' }}>

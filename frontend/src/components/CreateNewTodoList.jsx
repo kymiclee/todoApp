@@ -29,6 +29,25 @@ export default function CreateNewTodoList({ onSubmit }) {
         setOpen(false);
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        let formData
+        if (e.currentTarget instanceof HTMLFormElement) {
+            formData = new FormData(e.currentTarget);
+            formData.set('title', `New TodoList ${todoLists.length + 1}`);
+        } else {
+            formData = new FormData(e.currentTarget);
+        }
+        console.log(e.currentTarget)
+        const formJson = Object.fromEntries(formData.entries());
+
+        const title = formJson.title;
+
+        console.log('New todo list:', title);
+        onSubmit(formJson)
+        handleClose();
+    }
+
     return (
         <React.Fragment>
             <ListItemButton onClick={handleClickOpen}>
@@ -46,19 +65,7 @@ export default function CreateNewTodoList({ onSubmit }) {
                 onClose={handleClose}
                 PaperProps={{
                     component: 'form',
-                    onSubmit: (event) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const formJson = Object.fromEntries(formData.entries());
-
-                        // Access the username and password values
-                        const title = formJson.title;
-                        // Log username and password for debugging
-                        console.log('New todo list:', title);
-                        onSubmit(formJson)
-                        handleClose();
-
-                    }
+                    onSubmit: handleSubmit
                 }}
             >
                 <DialogTitle>Create Todo List</DialogTitle>

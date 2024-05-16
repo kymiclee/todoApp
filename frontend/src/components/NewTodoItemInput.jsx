@@ -2,14 +2,24 @@ import { useState } from "react";
 import { IconButton, InputAdornment, ListItem, TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
+import { UseTodoItemsContext } from "../hooks/UseTodoItemsContext";
+
+
 export default function NewTodoItemInput({ NewTodohandleSubmit }) {
     const [newTask, setNewTask] = useState('')
+    const { todoItems } = UseTodoItemsContext()
 
     const handleInputValue = (e) => {
         setNewTask(e.target.value)
     }
     const handleInputSubmit = () => {
-        const data = { task: newTask }
+        let data
+        if (newTask == '') {
+            data = { task: `Task ${todoItems.length + 1}` }
+        } else {
+            data = { task: newTask }
+        }
+
         console.log(newTask)
         NewTodohandleSubmit(data);
         setNewTask('')
