@@ -31,8 +31,11 @@ export const TodoListReducer = (state, action) => {
 }
 export const TodoListContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(TodoListReducer, { todoLists: null });
+    const resetTodoList = () => {
+        dispatch({ type: 'SET_TODOLIST', payload: null });
+    };
     return (
-        <TodoListContext.Provider value={{ ...state, dispatch }}>
+        <TodoListContext.Provider value={{ ...state, dispatch, resetTodoList }}>
             {children}
 
         </TodoListContext.Provider>

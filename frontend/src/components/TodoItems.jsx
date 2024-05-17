@@ -18,12 +18,12 @@ import useGet from "../hooks/API/GetHook";
 
 export default function TodoItem() {
     const { isAuthenticated } = UseUserAuthContext()// is user logged in 
-    const { todoItems, dispatch: dispatchItems } = UseTodoItemsContext() // useContext for all todo list for user
-    const { todoLists, dispatch: dispatchList } = UseTodoListsContext()
+    const { todoItems, dispatch: dispatchItems, resetTodoItem } = UseTodoItemsContext() // useContext for all todo list for user
+    const { todoLists, dispatch: dispatchList, resetTodoList } = UseTodoListsContext()
     const { state: currentList, dispatch: setCurrentList } = UseCurrentTodoList() //id of current list
     const [editId, setEditId] = useState(null) // contain item id to display the edit button
-    const [editTitle, setEditTitle] = useState(currentList.title || '')
-    const [originalTitle, setOriginalTitle] = useState(currentList.title || '')
+    const [editTitle, setEditTitle] = useState(currentList?.title || '')
+    const [originalTitle, setOriginalTitle] = useState(currentList?.title || '')
     const [editTitleButtonClicked, setEditTitleButtonClicked] = useState(false)
     const { postFetch, data: postData, loading: postLoading, error: postError } = usePost();
     const { deleteFetch, loading: deleteLoading, error: deleteError } = useDelete()
@@ -39,7 +39,7 @@ export default function TodoItem() {
         } else {
             setLoading(false)
             console.log('loading is false')
-        }
+        } 1
     }, [getLoading, putLoading, postLoading, deleteLoading])
 
     useEffect(() => {
@@ -58,6 +58,14 @@ export default function TodoItem() {
         console.log(currentList.title)
         console.log(todoLists)
     }, [getData])
+    useEffect(() => {
+        if (currentList == null) {
+            resetTodoItem()
+            resetTodoList()
+            setEditTitle('')
+
+        }
+    }, [currentList])
 
     useEffect(() => { // updates the list after new Item is added
         if (putData && putData.task) {

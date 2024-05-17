@@ -5,18 +5,24 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import { FormHelperText } from '@mui/material';
+import { useForm } from 'react-hook-form';
 import { useState, useEffect } from 'react';
-import { FormControl, OutlinedInput, InputLabel, InputAdornment, IconButton } from '@mui/material';
+import { FormControl, InputLabel, InputAdornment, IconButton } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import Input from '@mui/material/Input';
+
+import '../styles/error.css'
+
 import { UseUserAuthContext } from '../hooks/UseUserAuthContext'
 import usePost from "../hooks/API/PostHook";
 
 export default function FormDialog() {
     const { login } = UseUserAuthContext();
     const [open, setOpen] = React.useState(false);
-    const [showPassword, setShowPassword] = React.useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const { register, handleSubmit, formState: { errors } } = useForm();
     const { postFetch, data: postData, loading: postLoading, error: postError } = usePost({ credentials: 'include' });
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -36,20 +42,19 @@ export default function FormDialog() {
             login()
         }
     }, [postData])
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.currentTarget);
-        const formJson = Object.fromEntries(formData.entries());
 
-        await postFetch('/users/login', formJson)
+    useEffect(() => {
+        if (postError) {
+            console.error('Error registering user:', postError.message);
+            // Handle other errors (e.g., display an error message to the user)
+        }
+    }, [postError]);
 
-        // if (response.ok) {
-        //     login()
-        // } else {
-        //     const errorJson = await response.json();
-        //     console.error('Error:', response.status, errorJson.error);
-        // }
+    const onSubmit = async (data) => {
+
+        await postFetch('/users/login', data);
     };
+
     return (
         <React.Fragment>
             <Button variant="contained" onClick={handleClickOpen}>
@@ -58,52 +63,52 @@ export default function FormDialog() {
             <Dialog
                 open={open}
                 onClose={handleClose}
-                PaperProps={{
-                    component: 'form',
-                    onSubmit: (event) => {
-                        event.preventDefault();
-                        handleSubmit(event)
-                        handleClose();
-                    }
-                }}
             >
                 <DialogTitle>Login Form</DialogTitle>
                 <DialogContent>
-                    <TextField
-                        sx={{ m: 1, width: '30ch' }}
-                        variant='standard'
-                        id='username'
-                        name='username'
-                        label='Username'
-                        color='secondary'
-                    />
-                    <FormControl sx={{ m: 1, width: '30ch' }} variant="standard">
-                        <InputLabel htmlFor="password">Password</InputLabel>
-                        <Input
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <TextField
+                            {...register('username', { required: true })}
+                            sx={{ m: 1, width: '25ch' }}
+                            variant='standard'
+                            id='username'
+                            name='username'
+                            label='Username'
+                            error={errors.username ? true : false}
+                            helperText={errors.username ? "Username is required" : ""}
+
+                        />
+                        <TextField
+                            {...register('password', { required: true })}
+                            sx={{ m: 1, width: '25ch' }}
+                            variant='standard'
                             id="password"
                             name='password'
-                            color='secondary'
+                            label='Password'
                             type={showPassword ? 'text' : 'password'}
-                            endAdornment={
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="toggle password visibility"
-                                        onClick={handleClickShowPassword}
-                                        onMouseDown={handleMouseDownPassword}
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            }
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            aria-label="toggle password visibility"
+                                            onClick={handleClickShowPassword}
+                                            onMouseDown={(e) => e.preventDefault()}
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                            error={errors.password ? true : false}
+                            helperText={errors.password ? "Password is required" : ""}
                         />
-                    </FormControl>
-
+                        <DialogActions>
+                            <Button onClick={handleClose}>Cancel</Button>
+                            <Button type="submit">Login</Button>
+                        </DialogActions>
+                    </form>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button type="submit">Login</Button>
-                </DialogActions>
             </Dialog>
-        </React.Fragment >
+        </React.Fragment>
     );
 }

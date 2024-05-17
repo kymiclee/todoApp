@@ -29,8 +29,11 @@ function TodoItemReducer(state, action) {
 }
 export const TodoItemContextProvider = ({ children }) => {
     const [state, dispatch] = useReducer(TodoItemReducer, { todoItems: null });
+    const resetTodoItem = () => {
+        dispatch({ type: 'SET_TODOITEM', payload: null });
+    };
     return (
-        <TodoItemContext.Provider value={{ ...state, dispatch }}>
+        <TodoItemContext.Provider value={{ ...state, dispatch, resetTodoItem }}>
             {children}
         </TodoItemContext.Provider>
     )
