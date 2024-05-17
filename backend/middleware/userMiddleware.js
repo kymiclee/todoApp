@@ -3,7 +3,7 @@ const { CustomError } = require('./customError');
 
 const user = require('../models/users')
 
-module.exports.isUsernameUsed = async (req, res, next) => {
+const isUsernameUsed = async (req, res, next) => {
     const { username } = req.body;
     try {
         const name = await user.findOne({ username });
@@ -18,10 +18,12 @@ module.exports.isUsernameUsed = async (req, res, next) => {
 };
 
 
-module.exports.isLoggedIn = async (req, res, next) => {
+const isLoggedIn = async (req, res, next) => {
     if (req.session.user) {
         next()
     } else {
         next(new CustomError('User is not logged in', 401, 'auth'))
     }
 }
+
+module.exports = { isLoggedIn, isUsernameUsed }

@@ -2,9 +2,9 @@
 const express = require('express');
 const todoItem = require('../models/todoItem')
 
-const { CustomError } = require("./customError");
+const { CustomError } = require("../middleware/customError");
 
-module.exports.getAllItems = async (req, res) => {
+module.exports.getAllItems = async (req, res, next) => {
     try {
         const { listId } = req.params
         console.log(listId)
@@ -21,7 +21,7 @@ module.exports.getAllItems = async (req, res) => {
 }
 
 
-module.exports.createTodoItem = async (req, res) => {
+module.exports.createTodoItem = async (req, res, next) => {
     const { task } = req.body
     const { listId } = req.params
     // const listId = "6606429f24ba990c28fa4dbe";
@@ -33,7 +33,7 @@ module.exports.createTodoItem = async (req, res) => {
     }
 }
 
-module.exports.updateTodoItem = async (req, res) => {
+module.exports.updateTodoItem = async (req, res, next) => {
     // Logic to update a todo item in a todo list
 
     const { itemId } = req.params
@@ -56,7 +56,7 @@ module.exports.updateTodoItem = async (req, res) => {
 }
 
 
-module.exports.deleteTodoItem = async (req, res) => {
+module.exports.deleteTodoItem = async (req, res, next) => {
     const { itemId } = req.params
     try {
         const todo = await todoItem.findById(itemId)

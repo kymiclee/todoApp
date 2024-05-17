@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const { getAllLists, createList, updateListName, deleteList } = require('../controller/todoList')
 const { isLoggedIn } = require('../middleware/userMiddleware.js')
-const { doesListExist, doesItemExist } = require('../middleware/userMiddleware.js')
+const { doesListExist, doesItemExist } = require('../middleware/todoItemMiddleware.js')
 
 
 

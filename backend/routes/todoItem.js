@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getAllItems, createTodoItem, updateTodoItem, deleteTodoItem } = require('../controller/todoItem')
 const { isLoggedIn } = require('../middleware/userMiddleware.js')
-const { doesListExist, doesItemExist } = require('../middleware/userMiddleware.js')
+const { doesListExist, doesItemExist } = require('../middleware/todoItemMiddleware.js')
 
 // Get all todo items in a todo list
 router.get('/items/:listId', isLoggedIn, doesListExist, getAllItems);

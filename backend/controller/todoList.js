@@ -1,7 +1,7 @@
 const express = require('express');
 const todoList = require('../models/todoList');
-
-module.exports.getAllLists = async (req, res) => {
+const { CustomError } = require("../middleware/customError");
+module.exports.getAllLists = async (req, res, next) => {
     // Logic to retrieve all todo lists
     console.log('req.session.user:', req.session.user)
     const userId = req.session.user.id
@@ -15,7 +15,7 @@ module.exports.getAllLists = async (req, res) => {
 }
 
 
-module.exports.createList = async (req, res) => {
+module.exports.createList = async (req, res, next) => {
     var { title } = req.body
     const userId = req.session.user.id
     console.log(userId)
@@ -28,7 +28,7 @@ module.exports.createList = async (req, res) => {
     }
 }
 
-module.exports.updateListName = async (req, res) => {
+module.exports.updateListName = async (req, res, next) => {
     // Logic to update a todo list
     const { title } = req.body
     const { listId } = req.params
@@ -42,7 +42,7 @@ module.exports.updateListName = async (req, res) => {
     }
 }
 
-module.exports.deleteList = async (req, res) => {
+module.exports.deleteList = async (req, res, next) => {
     // Logic to delete a todo list
     const { listId } = req.params
     try {

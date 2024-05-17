@@ -1,7 +1,7 @@
 
 const users = require('../models/users')
 const bcrypt = require('bcrypt');
-const { CustomError } = require("./customError");
+const { CustomError } = require("../middleware/customError");
 
 module.exports.register = async (req, res, next) => {
     console.log('register')
