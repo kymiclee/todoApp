@@ -1,8 +1,9 @@
 
 const users = require('../models/users')
 const bcrypt = require('bcrypt');
+const { CustomError } = require("./customError");
 
-module.exports.register = async (req, res) => {
+module.exports.register = async (req, res, next) => {
     console.log('register')
     // Logic to create a new user account
     const { username, password } = req.body
@@ -11,14 +12,13 @@ module.exports.register = async (req, res) => {
     try {
         const newUser = await users.create({ username, password: hashedPassword })
         console.log(newUser)
-        // sets up session with userId and username
         req.session.userId = newUser._id
         req.session.username = username
         req.session.save()
         console.log('req session: ', req.session)
         return res.status(200).json({ message: 'Registration successful', user: newUser })
     } catch (error) {
-        return res.status(400).json({ error: error.message })
+        next(new CustomError(error.message, 500, 'register'))
     }
 }
 
@@ -27,7 +27,7 @@ module.exports.login = async (req, res, next) => {
 
     console.log('session regenerate')
     req.session.regenerate(function (err) {
-        if (err) return next(err)
+        if (err) return next(new CustomError(err.message, 500, 'login'))
 
         const sessionUser = {
             id: req.user._id,
@@ -50,7 +50,8 @@ module.exports.logout = async (req, res, next) => {
         console.log('session destroy')
         req.session.destroy(err => {
             if (err) {
-                return res.status(400).send('Unable to log out')
+                // return res.status(400).send('Unable to log out')
+                next(new CustomError(err.message, 500, 'logout'))
             } else {
                 return res.json({ message: 'Successfully logged out ' })
             }

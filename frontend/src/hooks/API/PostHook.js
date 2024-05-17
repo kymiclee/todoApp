@@ -6,7 +6,7 @@ const usePost = (queryParams = {}) => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
 
-    const postFetch = async (url, formData) => {
+    const postFetch = async (url, formData, type) => {
         try {
             setLoading(true)
             const response = await fetch(`/api/todo${url}`, {
@@ -18,7 +18,9 @@ const usePost = (queryParams = {}) => {
                 credentials: 'include'
             });
             if (!response.ok) {
-                throw new Error(`Fetch failed with status ${response.status}`);
+                const errorResponse = await response.json();
+                const errorMessage = errorResponse.error;
+                throw new Error(`POST failed with status:  ${response.status} error message: ${errorMessage}`);
             }
             const result = await response.json();
             setData(result)

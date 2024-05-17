@@ -11,7 +11,9 @@ const useGet = (queryParams = {}) => {
             setLoading(true);
             const response = await fetch(`api/todo/${url}`, { credentials: 'include' });
             if (!response.ok) {
-                throw new Error(`Fetch failed with status ${response.status}`);
+                const errorResponse = await response.json();
+                const errorMessage = errorResponse.error;
+                throw new Error(`GET failed with status:  ${response.status} error message: ${errorMessage}`);
             }
             const result = await response.json();
             setData(result);

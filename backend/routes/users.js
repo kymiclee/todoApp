@@ -2,7 +2,7 @@
 const express = require('express')
 const router = express.Router()
 const passport = require('passport');
-const { isUsernameUsed } = require('../middleware.js')
+const { isUsernameUsed } = require('../middleware/userMiddleware.js')
 
 const { register, login, logout } = require('../controller/user')
 // Register a new user

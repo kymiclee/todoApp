@@ -21,11 +21,14 @@ const itemRoutes = require('./routes/todoItem');
 const listRoutes = require('./routes/todoList');
 const userRoutes = require('./routes/users');
 
+
+const { errorHandler } = require('./middleware/errorMiddleware');
 const { userInfo } = require('os');
 
 //Express Setup
 const app = express()
 app.use(express.json());
+app.use(errorHandler);
 // app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 
 // app.use(passport.session())
@@ -100,11 +103,8 @@ app.use('/api/todo', listRoutes)
 app.use('/api/todo', userRoutes)
 
 //handle app error
-app.use((err, req, res, next) => {
-    const { statusCode = 500 } = err;
-    if (!err.message) err.message = 'Oh No, Something Went Wrong!'
-    res.status(statusCode).render('error', { err });
-})
+app.use(errorHandler);
+
 
 const port = process.env.PORT || 5000
 app.listen(port, () => {

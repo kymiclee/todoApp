@@ -15,7 +15,9 @@ const useDelete = (queryParams = {}) => {
                 }
             });
             if (!response.ok) {
-                throw new Error(`Fetch failed with status ${response.status}`);
+                const errorResponse = await response.json();
+                const errorMessage = errorResponse.error;
+                throw new Error(`DELETE failed with status:  ${response.status} error message: ${errorMessage}`);
             }
         } catch (error) {
             setError(error)

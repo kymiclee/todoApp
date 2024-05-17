@@ -10,10 +10,14 @@ import { FormControl, OutlinedInput, InputLabel, InputAdornment, IconButton } fr
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import Input from '@mui/material/Input';
+import { useEffect } from 'react';
+
+import usePost from "../hooks/API/PostHook";
 
 export default function FormDialog() {
     const [open, setOpen] = React.useState(false);
     const [showPassword, setShowPassword] = React.useState(false);
+    const { postFetch, data: postData, loading: postLoading, error: postError } = usePost({ credentials: 'include' });
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -28,6 +32,20 @@ export default function FormDialog() {
         setOpen(false);
     };
 
+    useEffect(() => {
+        if (postData) {
+            console.log('Registration successful:', postData);
+            handleClose()
+        }
+    }, [postData])
+
+    useEffect(() => {
+        if (postError) {
+            console.error('Error registering user:', postError.message);
+            // Handle other errors (e.g., display an error message to the user)
+        }
+    }, [postError]);
+
     const handleSubmit = async (event) => {
 
         const formData = new FormData(event.currentTarget);
@@ -39,34 +57,8 @@ export default function FormDialog() {
         console.log('Username:', username);
         console.log('Password:', password);
 
+        await postFetch('/users/register', formJson);
 
-        try {
-            const response = await fetch('/api/todo/users/register', {
-                method: 'POST',
-                body: JSON.stringify(formJson),
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include'
-            });
-
-            if (response.ok) {
-                // Registration successful
-                const json = await response.json();
-                console.log('Registration successful:', json);
-                handleClose(); // Close the dialog or perform other actions
-            } else {
-                // Registration failed
-                const errorJson = await response.json();
-                console.error('Registration failed:', response.status, errorJson.error);
-                // Display an error message to the user
-                // Example: setErrorState(errorJson.error);
-            }
-        } catch (error) {
-            console.error('Error registering user:', error);
-            // Handle other errors (e.g., network issues)
-            // Example: setErrorState('An error occurred while registering. Please try again later.');
-        }
     };
 
 

@@ -18,7 +18,9 @@ const usePut = (queryParams = {}) => {
                 credentials: 'include'
             });
             if (!response.ok) {
-                throw new Error(`Fetch failed with status ${response.status}`);
+                const errorResponse = await response.json();
+                const errorMessage = errorResponse.error;
+                throw new Error(`PUT failed with status:  ${response.status} error message: ${errorMessage}`);
             }
             const result = await response.json();
             setData(result)
