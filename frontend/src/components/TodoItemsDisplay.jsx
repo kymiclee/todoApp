@@ -4,7 +4,7 @@ import { Checkbox, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, 
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
-export default function TodoList({ todoItem, handleDeleteItem, handleEditItem, editId, setEditId, putData }) {
+export default function TodoList({ todoItem, handleDeleteItem, handleEditItem, editId, setEditId, putData, openErrorDialog }) {
     const [editButtonClicked, setEditButtonClicked] = useState(false);
     const [editValue, setEditValue] = useState(todoItem.task);
     const [originalValue, setOriginalValue] = useState(todoItem.task);
@@ -21,6 +21,11 @@ export default function TodoList({ todoItem, handleDeleteItem, handleEditItem, e
     const handleEditSubmit = (e) => {
         setEditButtonClicked(true); // Set edit button clicked to true
         console.log(editValue);
+        if (editValue == '') {
+            openErrorDialog('Edit Task Error', 'Task cannot be empty')
+            setEditValue(originalValue)
+            return
+        }
         const data = { task: editValue }; // Use the current value of editValue directly
         handleEditItem(todoItem._id, data);
         setOriginalValue(editValue); // Update originalValue after the edit is submitted

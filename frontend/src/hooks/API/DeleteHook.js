@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 const useDelete = (queryParams = {}) => {
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
+    const [deleteError, setError] = useState(null)
 
     const deleteFetch = async (url) => {
         try {
@@ -27,7 +27,7 @@ const useDelete = (queryParams = {}) => {
 
     }
 
-    return { deleteFetch, loading, error }
+    return { deleteFetch, loading, deleteError }
 };
 
 export default useDelete;

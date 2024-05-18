@@ -8,7 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 import { UseCurrentTodoList } from "../hooks/UseCurrentTodoList";
 
-export default function TodoListTitle({ handleBlur, handleDeleteList, handleTitleChange, handleTitleSubmit, editTitle }) {
+export default function TodoListTitle({ handleBlur, handleDeleteList, handleTitleChange, handleTitleSubmit, editTitle, setEditTitle, originalTitle }) {
     const { state: currentList } = UseCurrentTodoList()
     const [openDelete, setOpenDelete] = useState(false)
 
@@ -18,6 +18,14 @@ export default function TodoListTitle({ handleBlur, handleDeleteList, handleTitl
     const handleCloseDelete = () => {
         setOpenDelete(false)
     }
+
+    const handleCustomTitleSubmit = () => {
+        // Call the original handleTitleSubmit function
+        handleTitleSubmit();
+    };
+    useEffect(() => {
+        // Force re-render when editTitle changes
+    }, [editTitle]);
     return (
         <ListItem
             onBlur={handleBlur}
@@ -66,13 +74,13 @@ export default function TodoListTitle({ handleBlur, handleDeleteList, handleTitl
                 InputProps={{
                     endAdornment: (
                         <InputAdornment position="start"
-                            onMouseDown={handleTitleSubmit}>
+                            onMouseDown={handleCustomTitleSubmit}>
                             <EditIcon />
                         </InputAdornment>
                     )
                 }}
             />
 
-        </ListItem>
+        </ListItem >
     )
 }

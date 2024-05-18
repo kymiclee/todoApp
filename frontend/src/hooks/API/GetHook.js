@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 const useGet = (queryParams = {}) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
+    const [getError, setError] = useState(null)
 
     const fetchData = async (url) => {
         try {
             setLoading(true);
-            const response = await fetch(`api/todo/${url}`, { credentials: 'include' });
+            const response = await fetch(`api/todo${url}`, { credentials: 'include' });
             if (!response.ok) {
                 const errorResponse = await response.json();
                 const errorMessage = errorResponse.error;
@@ -24,6 +24,6 @@ const useGet = (queryParams = {}) => {
         }
     };
 
-    return { fetchData, data, loading, error }
+    return { fetchData, data, loading, getError }
 };
 export default useGet

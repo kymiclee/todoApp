@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 const usePost = (queryParams = {}) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
+    const [postError, setError] = useState(null)
 
     const postFetch = async (url, formData, type) => {
         try {
@@ -33,7 +33,7 @@ const usePost = (queryParams = {}) => {
 
     }
 
-    return { postFetch, data, loading, error }
+    return { postFetch, data, loading, postError }
 };
 
 export default usePost;

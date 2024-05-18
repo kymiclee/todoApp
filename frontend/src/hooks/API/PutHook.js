@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 const usePut = (queryParams = {}) => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState(null)
+    const [putError, setError] = useState(null)
 
     const putFetch = async (url, formData) => {
         try {
@@ -33,7 +33,7 @@ const usePut = (queryParams = {}) => {
 
     }
 
-    return { putFetch, data, loading, error }
+    return { putFetch, data, loading, putError }
 };
 
 export default usePut;

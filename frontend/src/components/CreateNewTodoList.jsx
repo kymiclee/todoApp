@@ -33,9 +33,11 @@ export default function CreateNewTodoList({ onSubmit }) {
         e.preventDefault();
         let formData
         if (e.currentTarget instanceof HTMLFormElement) {
+            // Create a new FormData with a default title
             formData = new FormData(e.currentTarget);
             formData.set('title', `New TodoList ${todoLists.length + 1}`);
         } else {
+
             formData = new FormData(e.currentTarget);
         }
         console.log(e.currentTarget)

@@ -15,6 +15,7 @@ import usePost from "../hooks/API/PostHook";
 import useDelete from '../hooks/API/DeleteHook';
 import usePut from "../hooks/API/PutHook";
 import useGet from "../hooks/API/GetHook";
+import ErrorDialog, { useErrorDialog } from "./ErrorDialog";
 
 export default function TodoItem() {
     const { isAuthenticated } = UseUserAuthContext()// is user logged in 
@@ -25,12 +26,47 @@ export default function TodoItem() {
     const [editTitle, setEditTitle] = useState(currentList?.title || '')
     const [originalTitle, setOriginalTitle] = useState(currentList?.title || '')
     const [editTitleButtonClicked, setEditTitleButtonClicked] = useState(false)
-    const { postFetch, data: postData, loading: postLoading, error: postError } = usePost();
-    const { deleteFetch, loading: deleteLoading, error: deleteError } = useDelete()
-    const { putFetch, data: putData, loading: putLoading, error } = usePut()
-    const { fetchData, data: getData, loading: getLoading, error: getError } = useGet()
+    const { postFetch, data: postData, loading: postLoading, postError } = usePost();
+    const { deleteFetch, loading: deleteLoading, deleteError } = useDelete()
+    const { putFetch, data: putData, loading: putLoading, putError } = usePut()
+    const { fetchData, data: getData, loading: getLoading, getError } = useGet()
+    const { openErrorDialog, closeErrorDialog, isOpen, alertMessage, alertTitle } = useErrorDialog();
+
     const [loading, setLoading] = useState(false)
 
+    useEffect(() => {
+        const fetchTodoItem = async () => {
+            await fetchData(`/items/${currentList._id}`)
+            setEditTitle(currentList.title || '')
+            setOriginalTitle(currentList.title || '')
+        }
+        if (isAuthenticated && currentList && currentList._id) {
+            fetchTodoItem()
+        }
+    }, [currentList, isAuthenticated, dispatchItems])
+
+    useEffect(() => {
+        if (postError) {
+            openErrorDialog('POST Fetch Error', postError.message)
+        }
+    }, [postError])
+    useEffect(() => {
+        if (deleteError) {
+            openErrorDialog('DELETE Fetch Error', deleteError.message)
+        }
+    }, [deleteError])
+
+    useEffect(() => {
+        if (putError) {
+            openErrorDialog('PUT Fetch Error', putError.message)
+        }
+    }, [putError])
+
+    useEffect(() => {
+        if (getError) {
+            openErrorDialog('GET Fetch Error', getError.message)
+        }
+    }, [getError])
 
     useEffect(() => {
         if (getLoading || putLoading || postLoading || deleteLoading) {
@@ -42,22 +78,15 @@ export default function TodoItem() {
         } 1
     }, [getLoading, putLoading, postLoading, deleteLoading])
 
-    useEffect(() => {
-        const fetchTodoItem = async () => {
-            await fetchData(`/items/${currentList._id}`)
-            setEditTitle(currentList.title || '')
-            setOriginalTitle(currentList.title || '')
-        }
-        if (isAuthenticated && currentList) {
-            fetchTodoItem()
-        }
-    }, [currentList, isAuthenticated, dispatchItems])
+
+
 
     useEffect(() => {
         dispatchItems({ type: 'SET_TODOITEM', payload: getData })
         console.log(currentList.title)
         console.log(todoLists)
     }, [getData])
+
     useEffect(() => {
         if (currentList == null) {
             resetTodoItem()
@@ -120,6 +149,7 @@ export default function TodoItem() {
     }
     const handleEditTitle = async (formData) => {
         try {
+
             await putFetch(`/list/${currentList._id}`, formData);
         } catch (error) {
             console.log({ error: error.message });
@@ -149,6 +179,11 @@ export default function TodoItem() {
     const handleTitleSubmit = (e) => {
         setEditTitleButtonClicked(true); // Set edit button clicked to true
         console.log(editTitle);
+        if (editTitle == '') {
+            openErrorDialog('Edit Title Error', 'Title cannot be empty')
+            setEditTitle(originalTitle)
+            return
+        }
         const data = { title: editTitle }; // Use the current value of editValue directly
         handleEditTitle(data);
         setOriginalTitle(editTitle); // Update originalValue after the edit is submitted
@@ -171,10 +206,19 @@ export default function TodoItem() {
                     handleTitleChange={handleTitleChange}
                     handleTitleSubmit={handleTitleSubmit}
                     editTitle={editTitle}
+                    setEditTitle={setEditTitle}
+                    originalTitle={originalTitle}
                 />
 
                 <Divider />
                 < NewTodoItemInput NewTodohandleSubmit={NewTodohandleSubmit} />
+
+                <ErrorDialog
+                    alertTitle={alertTitle}
+                    alertMessage={alertMessage}
+                    open={isOpen}
+                    handleClose={closeErrorDialog}
+                />
 
                 {todoItems && sortedTodoItems().map((todoItem) => (
                     <TodoItemsDisplay
@@ -185,6 +229,7 @@ export default function TodoItem() {
                         editId={editId}
                         setEditId={setEditId}
                         putData={putData}
+                        openErrorDialog={openErrorDialog}
                     />
                 ))
                 }
