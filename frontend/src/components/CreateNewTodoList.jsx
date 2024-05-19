@@ -14,13 +14,16 @@ import { ListItemIcon, ListItemText, ListItemButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Alert from '@mui/material/Alert';
 import CheckIcon from '@mui/icons-material/Check';
+
 import { UseUserAuthContext } from '../hooks/UseUserAuthContext'
 import { UseTodoListsContext } from "../hooks/UseTodoListsContext";
+import { UseErrorDialog } from '../hooks/UseErrorDialogContext';
 
 export default function CreateNewTodoList({ onSubmit }) {
-    const { login } = UseUserAuthContext();
     const [open, setOpen] = React.useState(false);
     const { todoLists, dispatch: dispatchList } = UseTodoListsContext()
+    const { isAuthenticated } = UseUserAuthContext()
+    const { openErrorDialog } = UseErrorDialog();
     const handleClickOpen = () => {
         setOpen(true);
     };
@@ -31,20 +34,22 @@ export default function CreateNewTodoList({ onSubmit }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        let formData
-        if (e.currentTarget instanceof HTMLFormElement) {
-            // Create a new FormData with a default title
-            formData = new FormData(e.currentTarget);
-            formData.set('title', `New TodoList ${todoLists.length + 1}`);
-        } else {
-
-            formData = new FormData(e.currentTarget);
+        let formData = new FormData(e.currentTarget);
+        const titleValue = formData.get('title');
+        console.log(isAuthenticated)
+        if (!isAuthenticated) {
+            handleClose();
+            return openErrorDialog('Authentication Error', 'User is not authenticated. Please log in.');
         }
-        console.log(e.currentTarget)
+        if (!titleValue.trim()) {
+            console.log('running in else')
+            formData = new FormData();
+            formData.set('title', `New TodoList ${todoLists.length + 1}`);
+        }
         const formJson = Object.fromEntries(formData.entries());
-
+        console.log('todoLists:', todoLists);
+        console.log(formData)
         const title = formJson.title;
-
         console.log('New todo list:', title);
         onSubmit(formJson)
         handleClose();

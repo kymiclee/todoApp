@@ -11,7 +11,7 @@ export const UserAuthContextProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     const login = () => {
-        // Perform login logic (e.g., authenticate user with Passport.js)
+        // Perform login logic (e.g., authenticate user with Passport.js)a
         setIsAuthenticated(true);
     };
 

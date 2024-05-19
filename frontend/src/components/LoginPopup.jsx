@@ -13,8 +13,6 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff'
 import Input from '@mui/material/Input';
 
-import '../styles/error.css'
-
 import { UseUserAuthContext } from '../hooks/UseUserAuthContext'
 import usePost from "../hooks/API/PostHook";
 

@@ -3,6 +3,8 @@ import { styled, Drawer as MuiDrawer } from '@mui/material';
 
 const StyledDrawer = styled(MuiDrawer)(({ theme }) => ({
     position: "relative",
+    top: "56px",
+    zIndex: 1,
     flexShrink: 0,
     minWidth: 240,
     "& .MuiDrawer-paper": {
@@ -68,22 +70,24 @@ export default function TodoList() {
     }, [isAuthenticated, dispatchList])
 
     useEffect(() => {
-        dispatchList({ type: 'SET_TODOLIST', payload: getData });
-        if (getData && getData.length > 0) {
-            console.log(getData[0])
-            setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: getData[0] })
-            console.log('Payload:', getData[0]);
-        } else {
-            console.error('Todo list is empty or undefined.');
+        const setTodoList = () => {
+            dispatchList({ type: 'SET_TODOLIST', payload: getData });
+            if (getData && getData.length > 0) {
+                setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: getData[0] })
+
+            } else {
+                console.error('Todo list is empty or undefined.');
+            }
+        }
+        if (getData) {
+            setTodoList()
         }
 
     }, [getData])
+
     const handleNewList = async (formData) => {
-        if (isAuthenticated) {
-            await postFetch('/lists/create', formData)
-        } else {
-            alert('User is not authenticated. Please log in.');
-        }
+        await postFetch('/lists/create', formData)
+
     }
     useEffect(() => {
         if (postData) {

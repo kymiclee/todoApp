@@ -7,7 +7,7 @@ const doesListExist = async (req, res, next) => {
     try {
         const listExists = await todoList.exists({ _id: listId });
         if (!listExists) {
-            throw new CustomError(`List with ID ${listId} does not exist`, 404, 'todoList');
+            throw new CustomError(`List with ID ${listId} does not exist`, 404, 'TodoListError');
         } else {
             next()
         }
@@ -20,7 +20,7 @@ const doesItemExist = async (req, res, next) => {
     try {
         const itemExists = await todoItem.exists({ _id: itemId });
         if (!itemExists) {
-            throw new CustomError(`Item with ID ${itemId} does not exist`, 404, 'todoItem');
+            throw new CustomError(`Item with ID ${itemId} does not exist`, 404, 'TodoItemError');
         } else {
             next()
         }

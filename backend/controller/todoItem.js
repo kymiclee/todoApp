@@ -16,7 +16,7 @@ module.exports.getAllItems = async (req, res, next) => {
         return res.status(200).json(todoItems)
 
     } catch (error) {
-        next(new CustomError(error.message, 500, 'todoItem'))
+        next(new CustomError(error.message, 500, 'TodoItemError'))
     }
 }
 
@@ -29,7 +29,7 @@ module.exports.createTodoItem = async (req, res, next) => {
         const newTodo = await todoItem.create({ task, todoList: listId })
         return res.status(200).json(newTodo)
     } catch (error) {
-        next(new CustomError(error.message, 500, 'todoItem'))
+        next(new CustomError(error.message, 500, 'TodoItemError'))
     }
 }
 
@@ -51,7 +51,7 @@ module.exports.updateTodoItem = async (req, res, next) => {
         const updateTodo = await todoItem.findByIdAndUpdate(itemId, updateData, { new: true })
         return res.status(200).json(updateTodo)
     } catch (error) {
-        next(new CustomError(error.message, 500, 'todoItem'))
+        next(new CustomError(error.message, 500, 'TodoItemError'))
     }
 }
 
@@ -64,7 +64,7 @@ module.exports.deleteTodoItem = async (req, res, next) => {
         const deleteTodo = await todoItem.findByIdAndDelete(itemId)
         return res.status(200).json(deleteTodo)
     } catch (error) {
-        next(new CustomError(error.message, 500, 'todoItem'))
+        next(new CustomError(error.message, 500, 'TodoItemError'))
     }
 }
 

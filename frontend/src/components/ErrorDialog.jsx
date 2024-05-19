@@ -1,54 +1,46 @@
-import { useState } from 'react';
-import { Button, Dialog, DialogTitle, IconButton, InputAdornment, ListItem, TextField } from '@mui/material';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-export default function ErrorDialog({ alertTitle, alertMessage, open, handleClose }) {
+import React, { useContext, useEffect } from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
+import { UseErrorDialog } from '../hooks/UseErrorDialogContext';
+
+export default function ErrorDialog() {
+    const { isOpen, alertMessage, alertTitle, closeErrorDialog } = UseErrorDialog();
+
+    useEffect(() => {
+        if (isOpen) {
+            console.log('isOpen has changed:', isOpen);
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
+        if (alertTitle) {
+            console.log('alertTitle has changed:', alertTitle);
+        }
+    }, [alertTitle]);
+
+    useEffect(() => {
+        if (alertMessage) {
+            console.log('alertMessage has changed:', alertMessage);
+        }
+    }, [alertMessage]);
+
     return (
         <Dialog
-            open={open}
-            onClose={handleClose}
+            open={isOpen}
+            onClose={closeErrorDialog}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
             <DialogTitle id="alert-dialog-title">
                 {alertTitle}
             </DialogTitle>
-
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                     {alertMessage}
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose}>Got It</Button>
+                <Button onClick={closeErrorDialog}>Got It</Button>
             </DialogActions>
         </Dialog>
     );
 }
-
-export const useErrorDialog = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
-    const [alertTitle, setAlertTitle] = useState('');
-
-    const openErrorDialog = (title, message) => {
-        setAlertTitle(title);
-        setAlertMessage(message);
-        setIsOpen(true);
-    };
-
-    const closeErrorDialog = () => {
-        setAlertTitle('');
-        setAlertMessage('');
-        setIsOpen(false);
-    };
-
-    return {
-        openErrorDialog,
-        closeErrorDialog,
-        isOpen,
-        alertMessage,
-        alertTitle
-    };
-};

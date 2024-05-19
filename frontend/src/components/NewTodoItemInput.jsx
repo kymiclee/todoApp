@@ -3,18 +3,21 @@ import { IconButton, InputAdornment, ListItem, TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 
 import { UseTodoItemsContext } from "../hooks/UseTodoItemsContext";
+import { UseUserAuthContext } from '../hooks/UseUserAuthContext';
 
-
-export default function NewTodoItemInput({ NewTodohandleSubmit }) {
+export default function NewTodoItemInput({ NewTodohandleSubmit, openErrorDialog }) {
     const [newTask, setNewTask] = useState('')
     const { todoItems } = UseTodoItemsContext()
+    const { isAuthenticated } = UseUserAuthContext()// is user logged in 
 
     const handleInputValue = (e) => {
         setNewTask(e.target.value)
     }
     const handleInputSubmit = () => {
         let data
-        if (newTask == '') {
+        if (!isAuthenticated) {
+            return openErrorDialog('User Error ', 'User is not logged in')
+        } else if (newTask == '') {
             data = { task: `Task ${todoItems.length + 1}` }
         } else {
             data = { task: newTask }

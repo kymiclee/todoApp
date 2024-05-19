@@ -1,13 +1,16 @@
 // @ts-nocheck
 import { useState, useEffect } from "react";
+import { useTheme } from '@mui/material/styles';
 import { Box, Divider, List } from '@mui/material';
 
 import { UseTodoListsContext } from "../hooks/UseTodoListsContext";
 import { UseTodoItemsContext } from "../hooks/UseTodoItemsContext";
 import { UseCurrentTodoList } from '../hooks/UseCurrentTodoList';
 import { UseUserAuthContext } from '../hooks/UseUserAuthContext';
+import { UseErrorDialog } from "../hooks/UseErrorDialogContext";
 
-import TodoItemsDisplay from '../components/TodoItemsDisplay'
+import LoadingIcon from "./LoadingIcon";
+import TodoItemsDisplay from './TodoItemsDisplay'
 import TodoListTitle from "./TodoListTitle";
 import NewTodoItemInput from "./NewTodoItemInput";
 
@@ -15,9 +18,13 @@ import usePost from "../hooks/API/PostHook";
 import useDelete from '../hooks/API/DeleteHook';
 import usePut from "../hooks/API/PutHook";
 import useGet from "../hooks/API/GetHook";
-import ErrorDialog, { useErrorDialog } from "./ErrorDialog";
+import ErrorDialog from "./ErrorDialog";
+
+
 
 export default function TodoItem() {
+    const theme = useTheme();
+    const backgroundColor = theme.palette.mode === 'dark' ? '#121212' : '#fff';
     const { isAuthenticated } = UseUserAuthContext()// is user logged in 
     const { todoItems, dispatch: dispatchItems, resetTodoItem } = UseTodoItemsContext() // useContext for all todo list for user
     const { todoLists, dispatch: dispatchList, resetTodoList } = UseTodoListsContext()
@@ -30,9 +37,9 @@ export default function TodoItem() {
     const { deleteFetch, loading: deleteLoading, deleteError } = useDelete()
     const { putFetch, data: putData, loading: putLoading, putError } = usePut()
     const { fetchData, data: getData, loading: getLoading, getError } = useGet()
-    const { openErrorDialog, closeErrorDialog, isOpen, alertMessage, alertTitle } = useErrorDialog();
-
+    const { openErrorDialog } = UseErrorDialog();
     const [loading, setLoading] = useState(false)
+
 
     useEffect(() => {
         const fetchTodoItem = async () => {
@@ -198,7 +205,7 @@ export default function TodoItem() {
     };
 
     return (
-        <Box component="div" sx={{ backgroundColor: 'white', width: '70%' }}>
+        <Box component="div" sx={{ width: '70%', marginTop: '56px', backgroundColor: { backgroundColor }, height: '100vh' }} >
             <List>
                 <TodoListTitle
                     handleBlur={handleBlur}
@@ -211,14 +218,9 @@ export default function TodoItem() {
                 />
 
                 <Divider />
-                < NewTodoItemInput NewTodohandleSubmit={NewTodohandleSubmit} />
-
-                <ErrorDialog
-                    alertTitle={alertTitle}
-                    alertMessage={alertMessage}
-                    open={isOpen}
-                    handleClose={closeErrorDialog}
-                />
+                < NewTodoItemInput NewTodohandleSubmit={NewTodohandleSubmit} openErrorDialog={openErrorDialog} />
+                <LoadingIcon loading={loading} />
+                <ErrorDialog />
 
                 {todoItems && sortedTodoItems().map((todoItem) => (
                     <TodoItemsDisplay
@@ -234,7 +236,7 @@ export default function TodoItem() {
                 ))
                 }
             </List >
-        </Box >
+        </ Box >
 
     )
 }

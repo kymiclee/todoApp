@@ -3,13 +3,15 @@ import { useState, useEffect } from 'react';
 import { Checkbox, IconButton, ListItem, ListItemIcon, ListItemSecondaryAction, TextField } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { useTheme } from '@mui/material/styles';
 
 export default function TodoList({ todoItem, handleDeleteItem, handleEditItem, editId, setEditId, putData, openErrorDialog }) {
     const [editButtonClicked, setEditButtonClicked] = useState(false);
     const [editValue, setEditValue] = useState(todoItem.task);
     const [originalValue, setOriginalValue] = useState(todoItem.task);
     const [checkBox, setCheckBox] = useState(todoItem.isCompleted)
-
+    const theme = useTheme();
+    const color = theme.palette.mode === 'dark' ? 'white' : 'black';
     const handleSelectListItem = () => {
         setEditId(todoItem._id);
     };
@@ -82,7 +84,7 @@ export default function TodoList({ todoItem, handleDeleteItem, handleEditItem, e
                         style: {
                             fontSize: '16px',
                             textDecoration: checkBox ? 'line-through' : 'none',
-                            color: checkBox ? 'grey' : 'black'
+                            color: checkBox ? 'grey' : color
                         }
                     }}
                     sx={{ width: '100%' }}

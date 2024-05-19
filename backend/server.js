@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-//imports
+//Imports
 const dotenv = require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -9,34 +9,30 @@ const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcrypt')
-const cors = require('cors')
 
-// importing models
+// Importing models
 const todoItem = require('./models/todoItem')
 const todoList = require('./models/todoList')
 const user = require('./models/users')
 
-// importing routes
+// Importing routes
 const itemRoutes = require('./routes/todoItem');
 const listRoutes = require('./routes/todoList');
 const userRoutes = require('./routes/users');
 
-
+// Middleware
 const { errorHandler } = require('./middleware/errorMiddleware');
-const { userInfo } = require('os');
+
 
 //Express Setup
 const app = express()
 app.use(express.json());
 app.use(errorHandler);
-// app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
-
-// app.use(passport.session())
 
 // Session Setup 
 const dbUrl = process.env.MONGO_URI
 app.use(session({
-    secret: 'secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -50,18 +46,16 @@ app.use(session({
         })
 }))
 
-// Mongoose Connection 
-// const dbUrl = process.env.MONGO_URI
+// Mongoose connection 
 mongoose.connect(dbUrl)
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
 
 
 
-//passport configuration
+//Passport configuration
 app.use(passport.initialize());
 app.use(passport.session())
-
 passport.use(new LocalStrategy(
     async function (username, password, done) {
         try {
@@ -69,8 +63,8 @@ passport.use(new LocalStrategy(
             if (!verifyUser) { return done(null, false); } // User not found
             const isMatch = await bcrypt.compare(password, verifyUser.password)
             if (!isMatch) { return done(null, false); }
-            if (!isMatch) { return done(null, false); } // Incorrect password
-            return done(null, verifyUser); // Authentication successful
+            if (!isMatch) { return done(null, false); }
+            return done(null, verifyUser);
 
         } catch (error) {
             return done(error)
@@ -80,32 +74,25 @@ passport.use(new LocalStrategy(
 
 
 //Passport serialization
-//cb == callback function
-// we use user._id as a unique identifyer from mongo
-// the callback function is called with the serailized user id as second arguement
-// the first argument null indicates there was no error during serialization
 passport.serializeUser(function (user, cb) {
     return cb(null, user._id);
 });
-
-// id is the serialized user
-// we specify how to get the user object based on the serialized identifier
-// once it is retrived it will be passed to the callback function 
 passport.deserializeUser(function (id, cb) {
     user.findById(id, function (err, user) {
         if (err) { return cb(err); }
         return cb(null, user);
     })
 });
-//routes
+
+//Routes
 app.use('/api/todo', itemRoutes)
 app.use('/api/todo', listRoutes)
 app.use('/api/todo', userRoutes)
 
-//handle app error
+//Error handling middleware
 app.use(errorHandler);
 
-
+//Server setup
 const port = process.env.PORT || 5000
 app.listen(port, () => {
     console.log(`todoApp backend listening on port ${port}`)

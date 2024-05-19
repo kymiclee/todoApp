@@ -1,6 +1,7 @@
 const express = require('express');
 const todoList = require('../models/todoList');
 const { CustomError } = require("../middleware/customError");
+const todoItem = require('../models/todoItem');
 module.exports.getAllLists = async (req, res, next) => {
     // Logic to retrieve all todo lists
     console.log('req.session.user:', req.session.user)
@@ -10,7 +11,7 @@ module.exports.getAllLists = async (req, res, next) => {
         const todoLists = await todoList.find({ user: userId })
         return res.status(200).json(todoLists)
     } catch (error) {
-        next(new CustomError(error.message, 500, 'todoList'))
+        next(new CustomError(error.message, 500, 'TodoListError'))
     }
 }
 
@@ -24,7 +25,7 @@ module.exports.createList = async (req, res, next) => {
         const newList = await todoList.create({ title, user: userId })
         return res.status(200).json(newList)
     } catch (error) {
-        next(new CustomError(error.message, 500, 'todoList'))
+        next(new CustomError(error.message, 500, 'TodoListError'))
     }
 }
 
@@ -38,7 +39,7 @@ module.exports.updateListName = async (req, res, next) => {
         const updatedList = await todoList.findByIdAndUpdate(listId, { title }, { new: true })
         return res.status(200).json(updatedList)
     } catch (error) {
-        next(new CustomError(error.message, 500, 'todoList'))
+        next(new CustomError(error.message, 500, 'TodoListError'))
     }
 }
 
@@ -47,10 +48,11 @@ module.exports.deleteList = async (req, res, next) => {
     const { listId } = req.params
     try {
         console.log("about to run find By and delete")
+        await todoItem.deleteMany({ todoList: listId }, { new: true });
         await todoList.findByIdAndDelete(listId, { new: true })
         return res.status(200).json({ message: 'Todo list and associated items deleted successfully' });
     } catch (error) {
-        next(new CustomError(error.message, 500, 'todoList'))
+        next(new CustomError(error.message, 500, 'TodoListError'))
     }
 }
 
