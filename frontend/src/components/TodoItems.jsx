@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { useTheme } from '@mui/material/styles';
 import { Box, Divider, List } from '@mui/material';
 
-import { UseTodoListsContext } from "../hooks/UseTodoListsContext";
-import { UseTodoItemsContext } from "../hooks/UseTodoItemsContext";
+import { UseTodoListContext } from "../hooks/UseTodoListContext";
+import { UseTodoItemContext } from "../hooks/UseTodoItemContext";
 import { UseCurrentTodoList } from '../hooks/UseCurrentTodoList';
 import { UseUserAuthContext } from '../hooks/UseUserAuthContext';
 import { UseErrorDialog } from "../hooks/UseErrorDialogContext";
@@ -25,18 +25,18 @@ import ErrorDialog from "./ErrorDialog";
 export default function TodoItem() {
     const theme = useTheme();
     const backgroundColor = theme.palette.mode === 'dark' ? '#121212' : '#fff';
-    const { isAuthenticated } = UseUserAuthContext()// is user logged in 
-    const { todoItems, dispatch: dispatchItems, resetTodoItem } = UseTodoItemsContext() // useContext for all todo list for user
-    const { todoLists, dispatch: dispatchList, resetTodoList } = UseTodoListsContext()
-    const { state: currentList, dispatch: setCurrentList } = UseCurrentTodoList() //id of current list
-    const [editId, setEditId] = useState(null) // contain item id to display the edit button
+    const { isAuthenticated } = UseUserAuthContext()
+    const { todoItem, dispatchItem, resetItem } = UseTodoItemContext()
+    const { todoList, dispatchList, resetList } = UseTodoListContext()
+    const { currentList, setCurrentList } = UseCurrentTodoList()
+    const [editId, setEditId] = useState(null)
     const [editTitle, setEditTitle] = useState(currentList?.title || '')
     const [originalTitle, setOriginalTitle] = useState(currentList?.title || '')
     const [editTitleButtonClicked, setEditTitleButtonClicked] = useState(false)
-    const { postFetch, data: postData, loading: postLoading, postError } = usePost();
-    const { deleteFetch, loading: deleteLoading, deleteError } = useDelete()
-    const { putFetch, data: putData, loading: putLoading, putError } = usePut()
-    const { fetchData, data: getData, loading: getLoading, getError } = useGet()
+    const { postFetch, postData, postLoading, postError } = usePost();
+    const { deleteFetch, deleteLoading, deleteError } = useDelete()
+    const { putFetch, putData, putLoading, putError } = usePut()
+    const { fetchData, getData, getLoading, getError } = useGet()
     const { openErrorDialog } = UseErrorDialog();
     const [loading, setLoading] = useState(false)
 
@@ -50,7 +50,7 @@ export default function TodoItem() {
         if (isAuthenticated && currentList && currentList._id) {
             fetchTodoItem()
         }
-    }, [currentList, isAuthenticated, dispatchItems])
+    }, [currentList, isAuthenticated, dispatchItem])
 
     useEffect(() => {
         if (postError) {
@@ -82,51 +82,45 @@ export default function TodoItem() {
         } else {
             setLoading(false)
             console.log('loading is false')
-        } 1
+        }
     }, [getLoading, putLoading, postLoading, deleteLoading])
 
-
-
-
     useEffect(() => {
-        dispatchItems({ type: 'SET_TODOITEM', payload: getData })
-        console.log(currentList.title)
-        console.log(todoLists)
+        if (getData) {
+            dispatchItem({ type: 'SET_TODOITEM', payload: getData })
+        }
     }, [getData])
 
     useEffect(() => {
         if (currentList == null) {
-            resetTodoItem()
-            resetTodoList()
+            resetItem()
+            resetList()
             setEditTitle('')
 
         }
     }, [currentList])
 
-    useEffect(() => { // updates the list after new Item is added
+    useEffect(() => {
         if (putData && putData.task) {
             console.log('putData has been updated:', putData);
-            dispatchItems({ type: 'PATCH_TODOITEM', payload: putData })
+            dispatchItem({ type: 'PATCH_TODOITEM', payload: putData })
         }
         if (putData && putData.title) {
             dispatchList({ type: 'PATCH_TODOLIST', payload: putData })
         }
     }, [putData]);
-    useEffect(() => { // updates the list after new Item is added
+    useEffect(() => {
         if (postData) {
             console.log('postData has been created:', postData);
-            dispatchItems({ type: 'CREATE_TODOITEM', payload: postData })
+            dispatchItem({ type: 'CREATE_TODOITEM', payload: postData })
         }
     }, [postData]);
 
     const sortedTodoItems = () => {
-        if (todoItems && !loading) {
-            return todoItems.slice().sort((a, b) => {
-                // Sort completed items first (true values come before false values)
+        if (todoItem && !loading) {
+            return todoItem.slice().sort((a, b) => {
                 return a.isCompleted === b.isCompleted ? 0 : (a.isCompleted ? 1 : -1);
             })
-            console.log('Sorted array: ', sortedArray)
-            return sortedArray
         }
         return []
     }
@@ -149,7 +143,7 @@ export default function TodoItem() {
         try {
             console.log("delete item with id of : ", itemId)
             await deleteFetch(`/items/${currentList._id}/${itemId}`);
-            dispatchItems({ type: 'DELETE_TODOITEM', payload: itemId })
+            dispatchItem({ type: 'DELETE_TODOITEM', payload: itemId })
         } catch (error) {
             console.log({ error: error.message });
         }
@@ -165,13 +159,13 @@ export default function TodoItem() {
     const handleDeleteList = async () => {
         try {
             await deleteFetch(`/list/${currentList._id}`);
-            dispatchItems({ type: 'DELETE_TODOITEM', payload: currentList._id })
+            dispatchItem({ type: 'DELETE_TODOITEM', payload: currentList._id })
             dispatchList({ type: 'DELETE_TODOLIST', payload: currentList })
 
-            if (currentList._id == todoLists[0]._id) {
-                setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoLists[1] })
+            if (currentList._id == todoList[0]._id) {
+                setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoList[1] })
             } else {
-                setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoLists[0] })
+                setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoList[0] })
             }
 
         } catch (error) {
@@ -183,18 +177,18 @@ export default function TodoItem() {
         setEditTitle(e.target.value);
     };
 
-    const handleTitleSubmit = (e) => {
-        setEditTitleButtonClicked(true); // Set edit button clicked to true
+    const handleTitleSubmit = () => {
+        setEditTitleButtonClicked(true);
         console.log(editTitle);
         if (editTitle == '') {
             openErrorDialog('Edit Title Error', 'Title cannot be empty')
             setEditTitle(originalTitle)
             return
         }
-        const data = { title: editTitle }; // Use the current value of editValue directly
+        const data = { title: editTitle };
         handleEditTitle(data);
-        setOriginalTitle(editTitle); // Update originalValue after the edit is submitted
-        setEditTitleButtonClicked(false); // Reset edit button clicked state after submission
+        setOriginalTitle(editTitle);
+        setEditTitleButtonClicked(false);
     };
 
     const handleBlur = () => {
@@ -222,7 +216,7 @@ export default function TodoItem() {
                 <LoadingIcon loading={loading} />
                 <ErrorDialog />
 
-                {todoItems && sortedTodoItems().map((todoItem) => (
+                {todoItem && sortedTodoItems().map((todoItem) => (
                     <TodoItemsDisplay
                         key={todoItem._id}
                         todoItem={todoItem}

@@ -1,8 +1,8 @@
 // @ts-nocheck
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-const useDelete = (queryParams = {}) => {
-    const [loading, setLoading] = useState(false)
+const useDelete = () => {
+    const [deleteLoading, setLoading] = useState(false)
     const [deleteError, setError] = useState(null)
 
     const deleteFetch = async (url) => {
@@ -27,7 +27,7 @@ const useDelete = (queryParams = {}) => {
 
     }
 
-    return { deleteFetch, loading, deleteError }
+    return { deleteFetch, deleteLoading, deleteError }
 };
 
 export default useDelete;

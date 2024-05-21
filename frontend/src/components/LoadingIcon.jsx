@@ -1,5 +1,3 @@
-import { blue } from "@mui/material/colors";
-import { useState } from "react";
 import ClipLoader from "react-spinners/ClipLoader";
 
 export default function LoadingIcon({ loading }) {

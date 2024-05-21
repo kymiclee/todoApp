@@ -20,7 +20,7 @@ export default function TodoList({ todoItem, handleDeleteItem, handleEditItem, e
         setEditValue(e.target.value);
     };
 
-    const handleEditSubmit = (e) => {
+    const handleEditSubmit = () => {
         setEditButtonClicked(true); // Set edit button clicked to true
         console.log(editValue);
         if (editValue == '') {
@@ -28,10 +28,9 @@ export default function TodoList({ todoItem, handleDeleteItem, handleEditItem, e
             setEditValue(originalValue)
             return
         }
-        const data = { task: editValue }; // Use the current value of editValue directly
+        const data = { task: editValue };
         handleEditItem(todoItem._id, data);
-        setOriginalValue(editValue); // Update originalValue after the edit is submitted
-        setEditButtonClicked(false); // Reset edit button clicked state after submission
+        setOriginalValue(editValue);
 
     };
 
@@ -42,9 +41,9 @@ export default function TodoList({ todoItem, handleDeleteItem, handleEditItem, e
         setEditButtonClicked(false);
     };
 
-    const handleCheckBox = () => {// still need work
+    const handleCheckBox = () => {
         console.log('checkbox is ', checkBox)
-        const updatedCheckBox = !checkBox; // Toggle the checkbox value
+        const updatedCheckBox = !checkBox;
         console.log(updatedCheckBox)
         const check = { isCompleted: updatedCheckBox }
         console.log(check)
@@ -111,5 +110,5 @@ export default function TodoList({ todoItem, handleDeleteItem, handleEditItem, e
 
         </>
     );
-};
+}
 

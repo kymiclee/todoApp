@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-const useGet = (queryParams = {}) => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(false)
+const useGet = () => {
+    const [getData, setData] = useState(null);
+    const [getLoading, setLoading] = useState(false)
     const [getError, setError] = useState(null)
 
     const fetchData = async (url) => {
@@ -24,6 +24,6 @@ const useGet = (queryParams = {}) => {
         }
     };
 
-    return { fetchData, data, loading, getError }
+    return { fetchData, getData, getLoading, getError }
 };
 export default useGet

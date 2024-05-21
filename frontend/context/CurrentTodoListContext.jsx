@@ -1,6 +1,6 @@
 // @ts-ignore
 import { useReducer } from "react";
-import { createContext, useState } from "react";
+import { createContext } from "react";
 
 export const CurrentTodoList = createContext()
 
@@ -15,16 +15,16 @@ const reducer = (state, action) => {
     }
 };
 export const CurrentTodoListProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(reducer, { currentList: null });
+    const [currentList, dispatchCurrentList] = useReducer(reducer, { currentList: null });
     const resetCurrentList = () => {
-        dispatch({ type: 'SET_CURRENT_TODO_LIST', payload: null });
+        dispatchCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: null });
     };
 
 
 
 
     return (
-        <CurrentTodoList.Provider value={{ state, dispatch, resetCurrentList }}>
+        <CurrentTodoList.Provider value={{ currentList, dispatchCurrentList, resetCurrentList }}>
             {children}
 
         </CurrentTodoList.Provider>

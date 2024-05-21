@@ -1,31 +1,4 @@
 // @ts-nocheck
-import { styled, Drawer as MuiDrawer } from '@mui/material';
-
-const StyledDrawer = styled(MuiDrawer)(({ theme }) => ({
-    position: "relative",
-    top: "56px",
-    zIndex: 1,
-    flexShrink: 0,
-    minWidth: 240,
-    "& .MuiDrawer-paper": {
-        minWidth: 240,
-        position: "absolute",
-        transition: "none !important",
-        width: "auto",
-        maxWidth: "100%",
-        [theme.breakpoints.up("sm")]: {
-            width: "100%",
-            minWidth: "100%",
-        },
-    },
-    "&.MuiDrawer-docked": {
-        flexShrink: 0,
-        width: "30%", // Adjust this value as needed
-        flexBasis: "30%", // Ensure the drawer retains its width in the docked state
-        position: "relative",
-    },
-}));
-
 import { useState, useEffect } from "react";
 import {
     Divider,
@@ -36,27 +9,41 @@ import {
     ListItemText,
 
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import Alert from '@mui/material/Alert';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
+import { StyledDrawer } from "../assets/StyledDrawer";
 
-import { UseTodoListsContext } from "../hooks/UseTodoListsContext";
+import { UseTodoListContext } from "../hooks/UseTodoListContext";
 import { UseUserAuthContext } from '../hooks/UseUserAuthContext';
 import { UseCurrentTodoList } from '../hooks/UseCurrentTodoList';
 import CreateNewTodoList from './CreateNewTodoList';
+import { UseErrorDialog } from "../hooks/UseErrorDialogContext";
 
 import usePost from "../hooks/API/PostHook";
 import useGet from "../hooks/API/GetHook";
-import usePut from "../hooks/API/PutHook";
+
 
 export default function TodoList() {
     const { isAuthenticated } = UseUserAuthContext();
-    const { todoLists, dispatch: dispatchList } = UseTodoListsContext()
-    const { state: currentList, dispatch: setCurrentList } = UseCurrentTodoList()
+    const { todoList, dispatchList } = UseTodoListContext()
+    const { currentList, dispatchCurrentList } = UseCurrentTodoList()
     const [successAlert, setSuccessAlert] = useState(false)
-    const { fetchData, data: getData, loading: getLoading, error: getError } = useGet()
-    const { postFetch, data: postData, error: postError } = usePost();
+    const { fetchData, getData, getError } = useGet()
+    const { postFetch, postData, postError } = usePost();
+    const { openErrorDialog } = UseErrorDialog();
+
+    useEffect(() => {
+        if (postError) {
+            openErrorDialog('POST Fetch Error', postError.message)
+        }
+    }, [postError])
+
+    useEffect(() => {
+        if (getError) {
+            openErrorDialog('GET Fetch Error', postError.message)
+        }
+    }, [getError])
 
     useEffect(() => {
         const fetchTodoList = async () => {
@@ -73,7 +60,7 @@ export default function TodoList() {
         const setTodoList = () => {
             dispatchList({ type: 'SET_TODOLIST', payload: getData });
             if (getData && getData.length > 0) {
-                setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: getData[0] })
+                dispatchCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: getData[0] })
 
             } else {
                 console.error('Todo list is empty or undefined.');
@@ -100,8 +87,7 @@ export default function TodoList() {
 
     return (
 
-        <StyledDrawer variant="permanent"
-        >
+        <StyledDrawer variant="permanent" sx={{ height: "100vh" }}>
             {successAlert && (
                 <Alert
                     icon={<CheckIcon fontSize="inherit" />}
@@ -128,18 +114,18 @@ export default function TodoList() {
                     <CreateNewTodoList onSubmit={handleNewList} />
                 </ListItem>
                 <Divider />
-                {todoLists && todoLists.map((todoList) => (
+                {todoList && todoList.map((todoList) => (
                     <ListItem key={todoList._id} disablePadding  >
                         <ListItemButton
                             onClick={() => {
-                                setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoList });
+                                dispatchCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoList });
                                 console.log('selected: ', todoList)
                             }}
                             selected={currentList === todoList._id}
                             sx={{
-                                backgroundColor: currentList === todoList._id ? '#FF0000' : 'inherit', // Change background color when selected
+                                backgroundColor: currentList === todoList._id ? '#FF0000' : 'inherit',
                                 '&:hover': {
-                                    backgroundColor: currentList === todoList._id ? '#FF0000' : 'rgba(0, 0, 0, 0.08)', // Change hover color when selected
+                                    backgroundColor: currentList === todoList._id ? '#FF0000' : 'rgba(0, 0, 0, 0.08)',
                                 },
                             }}
                         >

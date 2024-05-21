@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-const usePut = (queryParams = {}) => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(false)
+const usePut = () => {
+    const [putData, setData] = useState(null);
+    const [putLoading, setLoading] = useState(false)
     const [putError, setError] = useState(null)
 
     const putFetch = async (url, formData) => {
@@ -33,7 +33,7 @@ const usePut = (queryParams = {}) => {
 
     }
 
-    return { putFetch, data, loading, putError }
+    return { putFetch, putData, putLoading, putError }
 };
 
 export default usePut;

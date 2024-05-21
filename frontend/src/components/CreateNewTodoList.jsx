@@ -1,27 +1,27 @@
 import * as React from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import { useState } from 'react';
-import { FormControl, OutlinedInput, InputLabel, InputAdornment, IconButton } from '@mui/material';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff'
-import Input from '@mui/material/Input';
-import { ListItemIcon, ListItemText, ListItemButton } from '@mui/material';
+
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    ListItemIcon,
+    ListItemText,
+    ListItemButton,
+    TextField
+} from '@mui/material';
+
 import AddIcon from '@mui/icons-material/Add';
-import Alert from '@mui/material/Alert';
-import CheckIcon from '@mui/icons-material/Check';
+
 
 import { UseUserAuthContext } from '../hooks/UseUserAuthContext'
-import { UseTodoListsContext } from "../hooks/UseTodoListsContext";
+import { UseTodoListContext } from "../hooks/UseTodoListContext";
 import { UseErrorDialog } from '../hooks/UseErrorDialogContext';
 
 export default function CreateNewTodoList({ onSubmit }) {
     const [open, setOpen] = React.useState(false);
-    const { todoLists, dispatch: dispatchList } = UseTodoListsContext()
+    const { todoList } = UseTodoListContext()
     const { isAuthenticated } = UseUserAuthContext()
     const { openErrorDialog } = UseErrorDialog();
     const handleClickOpen = () => {
@@ -44,10 +44,10 @@ export default function CreateNewTodoList({ onSubmit }) {
         if (!titleValue.trim()) {
             console.log('running in else')
             formData = new FormData();
-            formData.set('title', `New TodoList ${todoLists.length + 1}`);
+            formData.set('title', `New TodoList ${todoList.length + 1}`);
         }
         const formJson = Object.fromEntries(formData.entries());
-        console.log('todoLists:', todoLists);
+        console.log('todoLists:', todoList);
         console.log(formData)
         const title = formJson.title;
         console.log('New todo list:', title);

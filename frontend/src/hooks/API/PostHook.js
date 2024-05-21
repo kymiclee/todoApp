@@ -1,12 +1,12 @@
 // @ts-nocheck
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-const usePost = (queryParams = {}) => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(false)
+const usePost = () => {
+    const [postData, setData] = useState(null);
+    const [postLoading, setLoading] = useState(false)
     const [postError, setError] = useState(null)
 
-    const postFetch = async (url, formData, type) => {
+    const postFetch = async (url, formData) => {
         try {
             setLoading(true)
             const response = await fetch(`/api/todo${url}`, {
@@ -20,6 +20,7 @@ const usePost = (queryParams = {}) => {
             if (!response.ok) {
                 const errorResponse = await response.json();
                 const errorMessage = errorResponse.error;
+                console.log(errorMessage)
                 throw new Error(`POST failed with status:  ${response.status} error message: ${errorMessage}`);
             }
             const result = await response.json();
@@ -33,7 +34,7 @@ const usePost = (queryParams = {}) => {
 
     }
 
-    return { postFetch, data, loading, postError }
+    return { postFetch, postData, postLoading, postError }
 };
 
 export default usePost;

@@ -1,29 +1,28 @@
+
+
 import React from 'react'
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
-import { ThemeProvider, createTheme, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 
-import RegisterPopup from './RegisterPopup'
-import LoginPopup from './LoginPopup'
+import RegisterPopup from './Popup/RegisterPopup'
+import LoginPopup from './Popup/LoginPopup'
 import Logout from './Logout';
 import { UseUserAuthContext } from '../hooks/UseUserAuthContext'
-import { ColorModeContext } from '../App';
+import { ColorModeContext } from '../pages/TodoPage';
 export default function ButtonAppBar() {
     const { isAuthenticated } = UseUserAuthContext();
     const theme = useTheme();
     const colorMode = React.useContext(ColorModeContext);
     return (
         <AppBar position="fixed">
-            <Container maxWidth="x1">
-                <Toolbar>
+            <Container maxWidth="xl">
+                <Toolbar sx={{ justifyContent: 'space-between' }}>
                     <IconButton sx={{ ml: 1, marginRight: '16px' }} onClick={colorMode.toggleColorMode} color="inherit">
                         {theme.palette.mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
                     </IconButton>

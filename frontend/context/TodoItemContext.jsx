@@ -8,32 +8,32 @@ function TodoItemReducer(state, action) {
         case 'SET_TODOITEM':
             return { // the payload on the action that we pass into the dispatch function
                 // would be an array of all of the workouts
-                todoItems: action.payload
+                todoItem: action.payload
             }
         case 'CREATE_TODOITEM':
             return {
-                todoItems: [action.payload, ...state.todoItems]
+                todoItem: [action.payload, ...state.todoItem]
             }
         case 'DELETE_TODOITEM':
             return {
-                todoItems: state.todoItems.filter(todoItem => todoItem._id !== action.payload)
+                todoItem: state.todoItem.filter(todoItem => todoItem._id !== action.payload)
             }
         case 'PATCH_TODOITEM':
             return {
                 // so if the workout id 
-                todoItems: state.todoItems.map(todoItem => todoItem._id == action.payload._id ? action.payload : todoItem)
+                todoItem: state.todoItem.map(todoItem => todoItem._id == action.payload._id ? action.payload : todoItem)
             }
         default:
             return state
     }
 }
 export const TodoItemContextProvider = ({ children }) => {
-    const [state, dispatch] = useReducer(TodoItemReducer, { todoItems: null });
-    const resetTodoItem = () => {
-        dispatch({ type: 'SET_TODOITEM', payload: null });
+    const [todoItem, dispatchItem] = useReducer(TodoItemReducer, { todoItem: null });
+    const resetItem = () => {
+        dispatchItem({ type: 'SET_TODOITEM', payload: null });
     };
     return (
-        <TodoItemContext.Provider value={{ ...state, dispatch, resetTodoItem }}>
+        <TodoItemContext.Provider value={{ ...todoItem, dispatchItem, resetItem }}>
             {children}
         </TodoItemContext.Provider>
     )
