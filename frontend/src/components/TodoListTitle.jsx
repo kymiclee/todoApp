@@ -56,7 +56,10 @@ export default function TodoListTitle({ handleBlur, handleDeleteList, handleTitl
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDelete}>Cancel</Button>
-                    <Button onClick={() => { handleCloseDelete(); handleDeleteList(); }} autoFocus>
+                    <Button onClick={() => {
+                        handleCloseDelete();
+                        handleDeleteList();
+                    }} autoFocus>
                         Agree
                     </Button>
                 </DialogActions>

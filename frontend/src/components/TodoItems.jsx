@@ -150,13 +150,15 @@ export default function TodoItem() {
     }
     const handleEditTitle = async (formData) => {
         try {
-
             await putFetch(`/list/${currentList._id}`, formData);
         } catch (error) {
             console.log({ error: error.message });
         }
     }
     const handleDeleteList = async () => {
+        if (!isAuthenticated) {
+            return openErrorDialog('Authentication Error', 'User is not authenticated. Please log in.')
+        }
         try {
             await deleteFetch(`/list/${currentList._id}`);
             dispatchItem({ type: 'DELETE_TODOITEM', payload: currentList._id })
@@ -167,7 +169,6 @@ export default function TodoItem() {
             } else {
                 setCurrentList({ type: 'SET_CURRENT_TODO_LIST', payload: todoList[0] })
             }
-
         } catch (error) {
             console.log({ error: error.message });
         }
@@ -180,10 +181,12 @@ export default function TodoItem() {
     const handleTitleSubmit = () => {
         setEditTitleButtonClicked(true);
         console.log(editTitle);
+        if (!isAuthenticated) {
+            return openErrorDialog('Authentication Error', 'User is not authenticated. Please log in.')
+        }
         if (editTitle == '') {
             openErrorDialog('Edit Title Error', 'Title cannot be empty')
-            setEditTitle(originalTitle)
-            return
+            return setEditTitle(originalTitle)
         }
         const data = { title: editTitle };
         handleEditTitle(data);
