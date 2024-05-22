@@ -17,11 +17,12 @@ const usePost = () => {
                 },
                 credentials: 'include'
             });
+            console.log(response.ok)
             if (!response.ok) {
                 const errorResponse = await response.json();
-                const errorMessage = errorResponse.error;
+                const errorMessage = errorResponse.message || 'Unknown error'
                 console.log(errorMessage)
-                throw new Error(`POST failed with status:  ${response.status} error message: ${errorMessage}`);
+                throw new Error(`POST status: ${response.status} <br> Error message: ${errorMessage}`);
             }
             const result = await response.json();
             setData(result)

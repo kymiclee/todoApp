@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import { UseErrorDialog } from '../hooks/UseErrorDialogContext';
 
@@ -34,13 +34,13 @@ export default function ErrorDialog() {
                 {alertTitle}
             </DialogTitle>
             <DialogContent>
-                <DialogContentText id="alert-dialog-description">
-                    {alertMessage}
+                <DialogContentText id="alert-dialog-description"
+                    dangerouslySetInnerHTML={{ __html: alertMessage }}>
                 </DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button onClick={closeErrorDialog}>Got It</Button>
             </DialogActions>
-        </Dialog>
+        </Dialog >
     );
 }

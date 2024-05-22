@@ -13,7 +13,7 @@ const useGet = () => {
             if (!response.ok) {
                 const errorResponse = await response.json();
                 const errorMessage = errorResponse.error;
-                throw new Error(`GET failed with status:  ${response.status} error message: ${errorMessage}`);
+                throw new Error(`GET status:  ${response.status} <br> Error Message: ${errorMessage}`);
             }
             const result = await response.json();
             setData(result);

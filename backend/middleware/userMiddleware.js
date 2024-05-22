@@ -8,6 +8,7 @@ const isUsernameUsed = async (req, res, next) => {
     try {
         const name = await user.findOne({ username });
         if (name) {
+            console.log("Error, registering same username ")
             throw new CustomError('Username already used', 400, 'register');
         } else {
             next();

@@ -21,7 +21,7 @@ export default function TodoList({ todoItem, handleDeleteItem, handleEditItem, e
     };
 
     const handleEditSubmit = () => {
-        setEditButtonClicked(true); // Set edit button clicked to true
+        setEditButtonClicked(true);
         console.log(editValue);
         if (editValue == '') {
             openErrorDialog('Edit Task Error', 'Task cannot be empty')

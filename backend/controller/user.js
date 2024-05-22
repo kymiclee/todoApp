@@ -17,7 +17,9 @@ module.exports.register = async (req, res, next) => {
         req.session.save()
         console.log('req session: ', req.session)
         return res.status(200).json({ message: 'Registration successful', user: newUser })
+
     } catch (error) {
+        console.log("Backend register error:", error.message)
         next(new CustomError(error.message, 500, 'register'))
     }
 }

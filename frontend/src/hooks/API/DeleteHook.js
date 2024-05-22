@@ -17,7 +17,7 @@ const useDelete = () => {
             if (!response.ok) {
                 const errorResponse = await response.json();
                 const errorMessage = errorResponse.error;
-                throw new Error(`DELETE failed with status:  ${response.status} error message: ${errorMessage}`);
+                throw new Error(`DELETE status:  ${response.status} <br> Error Message: ${errorMessage}`);
             }
         } catch (error) {
             setError(error)

@@ -3,6 +3,7 @@ const { CustomError } = require("./customError");
 const errorHandler = (err, req, res, next) => {
 
     if (err instanceof CustomError) {
+        console.log(err.statusCode, err.message)
         return res.status(err.statusCode).json({
             type: err.type,
             message: err.message
